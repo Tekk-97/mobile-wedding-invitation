@@ -24,6 +24,12 @@ const albumViewerCaption = document.querySelector("#album-viewer-caption");
 const albumCloseButton = document.querySelector(".album-viewer__close");
 const albumPrevButton = document.querySelector(".album-viewer__nav--prev");
 const albumNextButton = document.querySelector(".album-viewer__nav--next");
+const ddayLabel = document.querySelector("#dday-label");
+const welcomeMessage = document.querySelector("#welcome-message");
+const shareStatus = document.querySelector("#share-status");
+const shareKakaoButton = document.querySelector("#share-kakao");
+const shareNativeButton = document.querySelector("#share-native");
+const copyLinkButton = document.querySelector("#copy-link");
 let currentAlbumIndex = 0;
 let touchStartX = 0;
 
@@ -58,6 +64,33 @@ const formatDate = (value) =>
     hour: "2-digit",
     minute: "2-digit",
   }).format(new Date(value));
+
+const getShareUrl = () => window.location.href.split("#")[0];
+
+const setShareStatus = (message) => {
+  shareStatus.textContent = message;
+};
+
+const renderDday = () => {
+  const target = new Date(siteData.weddingDate);
+  const now = new Date();
+  const diffDays = Math.ceil((target - now) / (1000 * 60 * 60 * 24));
+
+  if (Number.isNaN(diffDays)) {
+    ddayLabel.textContent = "D-Day";
+  } else if (diffDays > 0) {
+    ddayLabel.textContent = `D-${diffDays}`;
+  } else if (diffDays === 0) {
+    ddayLabel.textContent = "D-Day";
+  } else {
+    ddayLabel.textContent = `D+${Math.abs(diffDays)}`;
+  }
+
+  const messages = Array.isArray(siteData.welcomeMessages) ? siteData.welcomeMessages : [];
+  welcomeMessage.textContent = messages.length
+    ? messages[Math.floor(Math.random() * messages.length)]
+    : "소중한 발걸음을 기다립니다.";
+};
 
 const renderAlbum = () => {
   const images = Array.isArray(siteData.albumImages) ? siteData.albumImages : [];
@@ -172,6 +205,10 @@ const renderAccounts = () => {
             <p>${escapeHtml(account.holder)} · ${escapeHtml(account.name)}</p>
           </div>
           <button type="button" data-copy-account="${index}">복사</button>
+          <div class="account-card__pay">
+            <button type="button" data-pay-account="${index}" data-pay-type="kakaoPayUrl">카카오페이</button>
+            <button type="button" data-pay-account="${index}" data-pay-type="tossUrl">토스</button>
+          </div>
         </article>
       `,
     )
@@ -197,6 +234,52 @@ accountList.addEventListener("click", async (event) => {
       button.textContent = "복사";
     }, 1400);
   }
+});
+
+accountList.addEventListener("click", async (event) => {
+  const button = event.target.closest("[data-pay-account]");
+  if (!button) return;
+
+  const account = siteData.accounts[Number(button.dataset.payAccount)];
+  const url = account[button.dataset.payType];
+  const copyValue = `${account.bank} ${account.number} ${account.holder}`;
+
+  if (url) {
+    window.location.href = url;
+    return;
+  }
+
+  await copyText(copyValue);
+  button.textContent = "계좌 복사됨";
+  setTimeout(() => {
+    button.textContent = button.dataset.payType === "kakaoPayUrl" ? "카카오페이" : "토스";
+  }, 1400);
+});
+
+document.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-navi]");
+  if (!button) return;
+
+  const venue = siteData.venue || {};
+  const lat = venue.latitude;
+  const lng = venue.longitude;
+  const name = encodeURIComponent(venue.name || "예식장");
+  const fallback = venue.kakaoMapUrl || venue.naverMapUrl || getShareUrl();
+
+  if (!lat || !lng) {
+    window.location.href = fallback;
+    return;
+  }
+
+  const appUrl =
+    button.dataset.navi === "kakao"
+      ? `kakaonavi://navigate?name=${name}&x=${lng}&y=${lat}&coord_type=wgs84`
+      : `tmap://route?goalname=${name}&goalx=${lng}&goaly=${lat}`;
+
+  window.location.href = appUrl;
+  setTimeout(() => {
+    window.location.href = fallback;
+  }, 900);
 });
 
 const renderMessages = (messages) => {
@@ -370,6 +453,70 @@ listEl.addEventListener("submit", async (event) => {
   await loadMessages();
 });
 
+const sharePayload = () => ({
+  title: siteData.shareTitle || "우리 결혼합니다",
+  text: siteData.shareDescription || "소중한 분들을 초대합니다.",
+  url: getShareUrl(),
+});
+
+shareNativeButton.addEventListener("click", async () => {
+  const payload = sharePayload();
+
+  try {
+    if (navigator.share) {
+      await navigator.share(payload);
+      return;
+    }
+
+    await copyText(payload.url);
+    setShareStatus("공유 기능을 지원하지 않아 링크를 복사했습니다.");
+  } catch {
+    setShareStatus("공유를 취소했습니다.");
+  }
+});
+
+copyLinkButton.addEventListener("click", async () => {
+  await copyText(getShareUrl());
+  setShareStatus("초대장 링크를 복사했습니다.");
+});
+
+shareKakaoButton.addEventListener("click", async () => {
+  const payload = sharePayload();
+
+  if (!config.kakaoJsKey || !window.Kakao?.Share) {
+    await copyText(payload.url);
+    setShareStatus("카카오 JavaScript 키가 없어 링크를 복사했습니다.");
+    return;
+  }
+
+  if (!window.Kakao.isInitialized()) {
+    window.Kakao.init(config.kakaoJsKey);
+  }
+
+  window.Kakao.Share.sendDefault({
+    objectType: "feed",
+    content: {
+      title: payload.title,
+      description: payload.text,
+      imageUrl: siteData.shareImage,
+      link: {
+        mobileWebUrl: payload.url,
+        webUrl: payload.url,
+      },
+    },
+    buttons: [
+      {
+        title: "초대장 보기",
+        link: {
+          mobileWebUrl: payload.url,
+          webUrl: payload.url,
+        },
+      },
+    ],
+  });
+});
+
+renderDday();
 renderAlbum();
 renderAccounts();
 loadMessages();

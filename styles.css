@@ -135,6 +135,26 @@ h3 {
   text-align: center;
 }
 
+.dday-panel {
+  display: grid;
+  gap: 8px;
+  margin: 0 auto 28px;
+  padding: 18px;
+  border-block: 1px solid var(--line);
+}
+
+.dday-panel strong {
+  color: var(--rose);
+  font-family: "Gowun Batang", serif;
+  font-size: 2.4rem;
+  line-height: 1;
+}
+
+.dday-panel span {
+  color: var(--muted);
+  line-height: 1.6;
+}
+
 .intro p:last-child,
 .location p,
 .album__empty p,
@@ -354,6 +374,11 @@ button {
   color: var(--sage);
 }
 
+.map-actions button {
+  background: var(--rose);
+  border-color: var(--rose);
+}
+
 .guestbook {
   background: #f1eadf;
 }
@@ -402,6 +427,46 @@ button {
 .account-card button {
   min-height: 40px;
   padding: 0 12px;
+}
+
+.account-card__pay {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.account-card__pay:empty {
+  display: none;
+}
+
+.account-card__pay button {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 0 10px;
+  background: var(--white);
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.share {
+  text-align: center;
+}
+
+.share-actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.share-actions button {
+  min-width: 0;
+  padding: 0 10px;
 }
 
 .guestbook__form {

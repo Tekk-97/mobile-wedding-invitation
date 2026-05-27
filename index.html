@@ -4,6 +4,13 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#f7f1ea" />
+    <meta name="description" content="민준 · 서연 결혼식에 초대합니다." />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="민준 · 서연 결혼합니다" />
+    <meta property="og:description" content="2026년 10월 24일 토요일 오후 12시 30분, 라움아트센터" />
+    <meta property="og:image" content="https://images.unsplash.com/photo-1520854221256-17451cc331bf?auto=format&fit=crop&w=1200&q=82" />
+    <meta property="og:url" content="https://tekk-97.github.io/mobile-wedding-invitation/" />
+    <meta name="twitter:card" content="summary_large_image" />
     <title>우리 결혼합니다</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -12,6 +19,7 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="./styles.css" />
+    <script defer src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.5/kakao.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="./site-data.js"></script>
     <script src="./config.js"></script>
@@ -24,6 +32,7 @@
           class="hero__image"
           src="https://images.unsplash.com/photo-1520854221256-17451cc331bf?auto=format&fit=crop&w=1200&q=82"
           alt="따뜻한 빛이 들어오는 결혼식장"
+          fetchpriority="high"
         />
         <div class="hero__shade"></div>
         <div class="hero__content">
@@ -36,6 +45,10 @@
 
       <section class="intro section">
         <p class="eyebrow">초대합니다</p>
+        <div class="dday-panel">
+          <strong id="dday-label">D-Day</strong>
+          <span id="welcome-message">소중한 발걸음을 기다립니다.</span>
+        </div>
         <h2>서로의 가장 좋은 계절이 되어<br />한 길을 걸어가려 합니다.</h2>
         <p>
           소중한 분들을 모시고 저희 두 사람이 부부로 첫걸음을 내딛습니다.
@@ -113,6 +126,8 @@
         <div class="map-actions">
           <a href="https://map.kakao.com/link/search/라움아트센터" target="_blank" rel="noreferrer">카카오맵</a>
           <a href="https://map.naver.com/p/search/라움아트센터" target="_blank" rel="noreferrer">네이버지도</a>
+          <button type="button" data-navi="kakao">카카오내비</button>
+          <button type="button" data-navi="tmap">티맵</button>
         </div>
       </section>
 
@@ -120,6 +135,17 @@
         <p class="eyebrow">마음 전하실 곳</p>
         <h2>축하의 마음을 전해주세요</h2>
         <div id="account-list" class="account__list"></div>
+      </section>
+
+      <section class="section share">
+        <p class="eyebrow">Share</p>
+        <h2>초대장 공유하기</h2>
+        <div class="share-actions">
+          <button type="button" id="share-kakao">카카오톡</button>
+          <button type="button" id="share-native">공유</button>
+          <button type="button" id="copy-link">링크 복사</button>
+        </div>
+        <p id="share-status" class="status" role="status"></p>
       </section>
 
       <section class="section guestbook">
