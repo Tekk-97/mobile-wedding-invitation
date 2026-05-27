@@ -24,13 +24,13 @@ const albumViewerCaption = document.querySelector("#album-viewer-caption");
 const albumCloseButton = document.querySelector(".album-viewer__close");
 const albumPrevButton = document.querySelector(".album-viewer__nav--prev");
 const albumNextButton = document.querySelector(".album-viewer__nav--next");
+const naverMapEl = document.querySelector("#naver-map");
 const ddayLabel = document.querySelector("#dday-label");
 const welcomeMessage = document.querySelector("#welcome-message");
 const shareStatus = document.querySelector("#share-status");
 const shareNativeButton = document.querySelector("#share-native");
 const copyLinkButton = document.querySelector("#copy-link");
 let currentAlbumIndex = 0;
-let touchStartX = 0;
 
 const getDeviceToken = () => {
   const key = "wedding_guestbook_device_token";
@@ -158,21 +158,83 @@ albumNextButton.addEventListener("click", () => showAlbumImage(currentAlbumIndex
 albumViewer.addEventListener("click", (event) => {
   if (event.target === albumViewer) closeAlbum();
 });
-albumViewer.addEventListener("touchstart", (event) => {
-  touchStartX = event.changedTouches[0].clientX;
-});
-albumViewer.addEventListener("touchend", (event) => {
-  const touchEndX = event.changedTouches[0].clientX;
-  const distance = touchEndX - touchStartX;
-  if (Math.abs(distance) < 40) return;
-  showAlbumImage(currentAlbumIndex + (distance < 0 ? 1 : -1));
-});
 document.addEventListener("keydown", (event) => {
   if (albumViewer.hidden) return;
   if (event.key === "Escape") closeAlbum();
   if (event.key === "ArrowLeft") showAlbumImage(currentAlbumIndex - 1);
   if (event.key === "ArrowRight") showAlbumImage(currentAlbumIndex + 1);
 });
+
+const loadNaverMapScript = () =>
+  new Promise((resolve, reject) => {
+    if (window.naver?.maps) {
+      resolve();
+      return;
+    }
+
+    if (!config.naverMapNcpKeyId) {
+      reject(new Error("missing naver map key"));
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.src = `https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=${encodeURIComponent(config.naverMapNcpKeyId)}`;
+    script.async = true;
+    script.onload = resolve;
+    script.onerror = reject;
+    document.head.append(script);
+  });
+
+const renderNaverMap = async () => {
+  const venue = siteData.venue || {};
+
+  try {
+    await loadNaverMapScript();
+    const position = new window.naver.maps.LatLng(venue.latitude, venue.longitude);
+    const map = new window.naver.maps.Map(naverMapEl, {
+      center: position,
+      zoom: 16,
+      scaleControl: false,
+      logoControl: false,
+      mapDataControl: false,
+    });
+
+    new window.naver.maps.Marker({
+      position,
+      map,
+      title: venue.name,
+    });
+  } catch {
+    naverMapEl.innerHTML = `
+      <div class="naver-map__fallback">
+        <strong>${escapeHtml(venue.name || "예식장")}</strong>
+        <span>${escapeHtml(venue.address || "네이버 지도 API 키를 설정하면 지도가 표시됩니다.")}</span>
+      </div>
+    `;
+  }
+};
+
+const revealSections = () => {
+  const sections = document.querySelectorAll(".section");
+
+  if (!("IntersectionObserver" in window)) {
+    sections.forEach((section) => section.classList.add("is-visible"));
+    return;
+  }
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add("is-visible");
+        observer.unobserve(entry.target);
+      });
+    },
+    { threshold: 0.16 },
+  );
+
+  sections.forEach((section) => observer.observe(section));
+};
 
 const copyText = async (text) => {
   if (navigator.clipboard?.writeText) {
@@ -483,4 +545,6 @@ copyLinkButton.addEventListener("click", async () => {
 renderDday();
 renderAlbum();
 renderAccounts();
+renderNaverMap();
+revealSections();
 loadMessages();

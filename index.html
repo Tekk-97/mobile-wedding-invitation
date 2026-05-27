@@ -122,11 +122,17 @@
         <p class="eyebrow">오시는 길</p>
         <h2>라움아트센터</h2>
         <p>서울특별시 강남구 언주로 564</p>
+        <div id="naver-map" class="naver-map" aria-label="예식장 위치 지도">
+          <div class="naver-map__fallback">
+            <strong>라움아트센터</strong>
+            <span>네이버 지도 API 키를 설정하면 지도가 표시됩니다.</span>
+          </div>
+        </div>
         <div class="map-actions">
-          <a href="https://map.kakao.com/link/search/라움아트센터" target="_blank" rel="noreferrer">카카오맵</a>
-          <a href="https://map.naver.com/p/search/라움아트센터" target="_blank" rel="noreferrer">네이버지도</a>
-          <button type="button" data-navi="kakao">카카오내비</button>
-          <button type="button" data-navi="tmap">티맵</button>
+          <a class="app-icon app-icon--kakao" href="https://map.kakao.com/link/search/라움아트센터" target="_blank" rel="noreferrer" aria-label="카카오맵 열기" title="카카오맵"></a>
+          <a class="app-icon app-icon--naver" href="https://map.naver.com/p/search/라움아트센터" target="_blank" rel="noreferrer" aria-label="네이버지도 열기" title="네이버지도"></a>
+          <button class="app-icon app-icon--kakaonavi" type="button" data-navi="kakao" aria-label="카카오내비 열기" title="카카오내비"></button>
+          <button class="app-icon app-icon--tmap" type="button" data-navi="tmap" aria-label="티맵 열기" title="티맵"></button>
         </div>
       </section>
 
@@ -142,9 +148,11 @@
         <div class="share-actions">
           <button type="button" id="share-native" aria-label="공유하기" title="공유하기">
             <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7" />
-              <path d="M12 16V4" />
-              <path d="m7 9 5-5 5 5" />
+              <circle cx="18" cy="5" r="3" />
+              <circle cx="6" cy="12" r="3" />
+              <circle cx="18" cy="19" r="3" />
+              <path d="m8.6 10.5 6.8-4" />
+              <path d="m8.6 13.5 6.8 4" />
             </svg>
           </button>
           <button type="button" id="copy-link" aria-label="링크 복사" title="링크 복사">

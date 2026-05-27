@@ -33,6 +33,19 @@ body.is-viewing-album {
   overflow: hidden;
 }
 
+.section {
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 680ms ease,
+    transform 680ms ease;
+}
+
+.section.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 a {
   color: inherit;
 }
@@ -362,21 +375,91 @@ button {
   text-align: center;
 }
 
+.naver-map {
+  display: grid;
+  min-height: 230px;
+  margin-top: 24px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--white);
+}
+
+.naver-map__fallback {
+  display: grid;
+  gap: 8px;
+  place-items: center;
+  padding: 24px;
+}
+
+.naver-map__fallback strong {
+  font-family: "Gowun Batang", serif;
+  font-size: 1.5rem;
+}
+
+.naver-map__fallback span {
+  color: var(--muted);
+  line-height: 1.6;
+}
+
 .map-actions {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  grid-template-columns: repeat(4, 48px);
+  justify-content: center;
+  gap: 12px;
   margin-top: 24px;
 }
 
-.map-actions a:last-child {
-  background: transparent;
-  color: var(--sage);
+.app-icon {
+  position: relative;
+  display: inline-grid;
+  width: 48px;
+  min-height: 48px;
+  place-items: center;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  color: white;
+  text-decoration: none;
+  box-shadow: 0 10px 22px rgba(58, 45, 36, 0.12);
 }
 
-.map-actions button {
-  background: var(--rose);
-  border-color: var(--rose);
+.app-icon::before {
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
+.app-icon--kakao {
+  background: #fee500;
+  color: #191919;
+}
+
+.app-icon--kakao::before {
+  content: "K";
+}
+
+.app-icon--naver {
+  background: #03c75a;
+}
+
+.app-icon--naver::before {
+  content: "N";
+}
+
+.app-icon--kakaonavi {
+  background: #3a1d1d;
+}
+
+.app-icon--kakaonavi::before {
+  content: "Navi";
+  font-size: 0.72rem;
+}
+
+.app-icon--tmap {
+  background: #101f6b;
+}
+
+.app-icon--tmap::before {
+  content: "T";
 }
 
 .guestbook {
@@ -449,20 +532,28 @@ button {
   padding: 0 10px;
   background: #ffeb00;
   color: #191919;
+  font-size: 0.92rem;
   font-weight: 700;
 }
 
 .kakao-pay-mark {
   display: inline-flex;
   align-items: center;
-  gap: 2px;
-  font-weight: 900;
+  gap: 7px;
+  font-weight: 700;
   letter-spacing: 0;
 }
 
 .kakao-pay-mark::before {
-  content: "kakao";
-  font-weight: 700;
+  content: "";
+  width: 20px;
+  height: 20px;
+  border-radius: 7px;
+  background: #191919;
+}
+
+.kakao-pay-mark::after {
+  content: "카카오페이 송금";
 }
 
 .share {
@@ -492,6 +583,14 @@ button {
   stroke-linecap: round;
   stroke-linejoin: round;
   stroke-width: 2;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .section {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
 }
 
 .guestbook__form {
@@ -532,6 +631,12 @@ button {
 button:disabled {
   cursor: wait;
   opacity: 0.65;
+}
+
+.map-actions .app-icon {
+  width: 48px;
+  min-height: 48px;
+  padding: 0;
 }
 
 .status {
