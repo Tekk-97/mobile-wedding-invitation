@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f7f1ea" />
+    <title>우리 결혼합니다</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Noto+Sans+KR:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="./config.js"></script>
+    <script defer src="./app.js"></script>
+  </head>
+  <body>
+    <main class="site-shell">
+      <section class="hero" aria-label="청첩장 첫 화면">
+        <img
+          class="hero__image"
+          src="https://images.unsplash.com/photo-1520854221256-17451cc331bf?auto=format&fit=crop&w=1200&q=82"
+          alt="따뜻한 빛이 들어오는 결혼식장"
+        />
+        <div class="hero__shade"></div>
+        <div class="hero__content">
+          <p class="kicker">Wedding Invitation</p>
+          <h1>민준 · 서연</h1>
+          <p class="hero__date">2026. 10. 24 SAT 12:30 PM</p>
+          <p class="hero__place">라움아트센터 2층 마제스틱볼룸</p>
+        </div>
+      </section>
+
+      <section class="intro section">
+        <p class="eyebrow">초대합니다</p>
+        <h2>서로의 가장 좋은 계절이 되어<br />한 길을 걸어가려 합니다.</h2>
+        <p>
+          소중한 분들을 모시고 저희 두 사람이 부부로 첫걸음을 내딛습니다.
+          오셔서 따뜻한 마음으로 축복해 주시면 더없이 큰 기쁨이겠습니다.
+        </p>
+      </section>
+
+      <section class="info-band">
+        <div>
+          <span>날짜</span>
+          <strong>2026년 10월 24일 토요일</strong>
+        </div>
+        <div>
+          <span>시간</span>
+          <strong>오후 12시 30분</strong>
+        </div>
+        <div>
+          <span>장소</span>
+          <strong>라움아트센터 2층</strong>
+        </div>
+      </section>
+
+      <section class="section people">
+        <p class="eyebrow">신랑 · 신부</p>
+        <div class="people__grid">
+          <article>
+            <span>Groom</span>
+            <h3>김민준</h3>
+            <p>김철수 · 이영희의 장남</p>
+            <a href="tel:010-0000-0000">연락하기</a>
+          </article>
+          <article>
+            <span>Bride</span>
+            <h3>이서연</h3>
+            <p>이정호 · 박미자의 장녀</p>
+            <a href="tel:010-1111-1111">연락하기</a>
+          </article>
+        </div>
+      </section>
+
+      <section class="section calendar">
+        <p class="eyebrow">Calendar</p>
+        <div class="calendar__head">
+          <h2>2026.10</h2>
+          <span>토요일 낮 12:30</span>
+        </div>
+        <div class="calendar__grid" aria-label="2026년 10월 달력">
+          <b>일</b><b>월</b><b>화</b><b>수</b><b>목</b><b>금</b><b>토</b>
+          <span></span><span></span><span></span><span></span>
+          <span>1</span><span>2</span><span>3</span>
+          <span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
+          <span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span>
+          <span>18</span><span>19</span><span>20</span><span>21</span><span>22</span><span>23</span><span class="selected">24</span>
+          <span>25</span><span>26</span><span>27</span><span>28</span><span>29</span><span>30</span><span>31</span>
+        </div>
+      </section>
+
+      <section class="section location">
+        <p class="eyebrow">오시는 길</p>
+        <h2>라움아트센터</h2>
+        <p>서울특별시 강남구 언주로 564</p>
+        <div class="map-actions">
+          <a href="https://map.kakao.com/link/search/라움아트센터" target="_blank" rel="noreferrer">카카오맵</a>
+          <a href="https://map.naver.com/p/search/라움아트센터" target="_blank" rel="noreferrer">네이버지도</a>
+        </div>
+      </section>
+
+      <section class="section guestbook">
+        <p class="eyebrow">Guestbook</p>
+        <h2>축하의 마음을 남겨주세요</h2>
+
+        <form id="guestbook-form" class="guestbook__form">
+          <label>
+            이름
+            <input id="guest-name" name="name" maxlength="20" autocomplete="name" required />
+          </label>
+          <label>
+            참석 여부
+            <select id="guest-attendance" name="attendance">
+              <option value="참석 예정">참석 예정</option>
+              <option value="불참">불참</option>
+              <option value="미정">미정</option>
+            </select>
+          </label>
+          <label>
+            메시지
+            <textarea id="guest-message" name="message" maxlength="300" rows="4" required></textarea>
+          </label>
+          <button type="submit">방명록 남기기</button>
+          <p id="form-status" class="status" role="status"></p>
+        </form>
+
+        <div id="guestbook-list" class="guestbook__list" aria-live="polite"></div>
+      </section>
+    </main>
+  </body>
+</html>
