@@ -14,6 +14,10 @@
   box-sizing: border-box;
 }
 
+[hidden] {
+  display: none !important;
+}
+
 html {
   scroll-behavior: smooth;
 }
@@ -128,7 +132,9 @@ h3 {
 }
 
 .intro p:last-child,
-.location p {
+.location p,
+.album__empty p,
+.account-card p {
   margin: 22px 0 0;
   color: var(--muted);
   line-height: 1.9;
@@ -236,6 +242,36 @@ button {
   font-weight: 700;
 }
 
+.album {
+  text-align: center;
+}
+
+.album__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.album__grid img {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.album__empty {
+  grid-column: 1 / -1;
+  padding: 34px 22px;
+  border: 1px dashed var(--line);
+  border-radius: 8px;
+  background: var(--white);
+}
+
+.album__empty p {
+  margin-top: 8px;
+}
+
 .location {
   text-align: center;
 }
@@ -254,6 +290,52 @@ button {
 
 .guestbook {
   background: #f1eadf;
+}
+
+.account {
+  background: var(--white);
+  border-block: 1px solid var(--line);
+}
+
+.account__list {
+  display: grid;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.account-card {
+  display: grid;
+  grid-template-columns: 1fr 72px;
+  gap: 14px;
+  align-items: center;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--paper);
+}
+
+.account-card span {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--rose);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.account-card strong {
+  display: block;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.account-card p {
+  margin-top: 4px;
+  line-height: 1.5;
+}
+
+.account-card button {
+  min-height: 40px;
+  padding: 0 12px;
 }
 
 .guestbook__form {
@@ -328,6 +410,53 @@ button:disabled {
   margin: 10px 0 0;
   line-height: 1.7;
   white-space: pre-wrap;
+}
+
+.admin-shell {
+  min-height: 100vh;
+}
+
+.admin-title {
+  color: var(--ink);
+  font-size: 2.4rem;
+  text-shadow: none;
+}
+
+.admin-copy {
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.admin-panel,
+.admin-list {
+  display: grid;
+  gap: 14px;
+  margin-top: 22px;
+}
+
+.admin-card {
+  display: grid;
+  gap: 12px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--white);
+}
+
+.admin-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.secondary-button {
+  background: transparent;
+  color: var(--sage);
+}
+
+.danger-button {
+  border-color: #b76662;
+  background: #b76662;
 }
 
 @media (min-width: 720px) {

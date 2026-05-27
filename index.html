@@ -13,6 +13,7 @@
     />
     <link rel="stylesheet" href="./styles.css" />
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="./site-data.js"></script>
     <script src="./config.js"></script>
     <script defer src="./app.js"></script>
   </head>
@@ -92,6 +93,12 @@
         </div>
       </section>
 
+      <section class="section album">
+        <p class="eyebrow">Album</p>
+        <h2>우리의 순간들</h2>
+        <div id="album-grid" class="album__grid"></div>
+      </section>
+
       <section class="section location">
         <p class="eyebrow">오시는 길</p>
         <h2>라움아트센터</h2>
@@ -100,6 +107,12 @@
           <a href="https://map.kakao.com/link/search/라움아트센터" target="_blank" rel="noreferrer">카카오맵</a>
           <a href="https://map.naver.com/p/search/라움아트센터" target="_blank" rel="noreferrer">네이버지도</a>
         </div>
+      </section>
+
+      <section class="section account">
+        <p class="eyebrow">마음 전하실 곳</p>
+        <h2>축하의 마음을 전해주세요</h2>
+        <div id="account-list" class="account__list"></div>
       </section>
 
       <section class="section guestbook">

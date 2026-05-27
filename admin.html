@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#f7f1ea" />
+    <title>방명록 관리</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="./config.js"></script>
+    <script defer src="./admin.js"></script>
+  </head>
+  <body>
+    <main class="site-shell admin-shell">
+      <section class="section">
+        <p class="eyebrow">Admin</p>
+        <h1 class="admin-title">방명록 관리</h1>
+        <p class="admin-copy">Supabase Auth에 등록된 관리자 계정으로 로그인하세요.</p>
+
+        <form id="login-form" class="guestbook__form">
+          <label>
+            이메일
+            <input id="admin-email" type="email" autocomplete="email" required />
+          </label>
+          <label>
+            비밀번호
+            <input id="admin-password" type="password" autocomplete="current-password" required />
+          </label>
+          <button type="submit">로그인</button>
+        </form>
+
+        <div id="admin-panel" class="admin-panel" hidden>
+          <button id="logout-button" type="button" class="secondary-button">로그아웃</button>
+          <div id="admin-list" class="admin-list"></div>
+        </div>
+
+        <p id="admin-status" class="status" role="status"></p>
+      </section>
+    </main>
+  </body>
+</html>

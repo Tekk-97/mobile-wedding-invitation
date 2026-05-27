@@ -8,6 +8,22 @@ GitHub Pages에 배포할 수 있는 모바일 청첩장입니다. Supabase를 �
 2. SQL Editor에서 `supabase-schema.sql` 내용을 실행합니다.
 3. Project Settings > API에서 Project URL과 anon public key를 확인합니다.
 
+## 관리자 계정
+
+방명록 수정/삭제는 `/admin.html`에서 합니다.
+
+1. Supabase Dashboard > Authentication > Users에서 관리자 계정을 만듭니다.
+2. 생성된 User UID를 복사합니다.
+3. SQL Editor에서 아래 SQL을 실행합니다.
+
+```sql
+insert into public.admin_users (user_id, email)
+values ('USER_UID_HERE', 'admin@example.com')
+on conflict (user_id) do update set email = excluded.email;
+```
+
+`USER_UID_HERE`와 이메일은 실제 관리자 계정 값으로 바꾸세요.
+
 ## GitHub Secrets
 
 이 저장소는 `config.js`를 커밋하지 않습니다. GitHub Actions가 배포할 때 Secrets 값으로 `config.js`를 생성합니다.
@@ -32,6 +48,7 @@ GitHub Pages에 배포할 수 있는 모바일 청첩장입니다. Supabase를 �
 ## 수정할 곳
 
 - 이름, 날짜, 장소: `index.html`
+- 앨범 사진 URL, 계좌번호: `site-data.js`
 - 대표 이미지: `index.html`의 `.hero__image` `src`
 - 색상과 여백: `styles.css`의 `:root`
 - 지도 링크: `index.html`의 카카오맵/네이버지도 링크

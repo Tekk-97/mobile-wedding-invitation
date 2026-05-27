@@ -1,4 +1,5 @@
 const config = window.WEDDING_CONFIG || {};
+const siteData = window.WEDDING_SITE_DATA || {};
 const isConfigured =
   config.supabaseUrl &&
   config.supabaseAnonKey &&
@@ -15,6 +16,8 @@ const listEl = document.querySelector("#guestbook-list");
 const nameInput = document.querySelector("#guest-name");
 const attendanceInput = document.querySelector("#guest-attendance");
 const messageInput = document.querySelector("#guest-message");
+const albumGrid = document.querySelector("#album-grid");
+const accountList = document.querySelector("#account-list");
 
 const setStatus = (message) => {
   statusEl.textContent = message;
@@ -35,6 +38,85 @@ const formatDate = (value) =>
     hour: "2-digit",
     minute: "2-digit",
   }).format(new Date(value));
+
+const renderAlbum = () => {
+  const images = Array.isArray(siteData.albumImages) ? siteData.albumImages : [];
+
+  if (!images.length) {
+    albumGrid.innerHTML = `
+      <div class="album__empty">
+        <strong>사진 준비 중</strong>
+        <p>나중에 사진 URL을 추가하면 이곳에 앨범이 표시됩니다.</p>
+      </div>
+    `;
+    return;
+  }
+
+  albumGrid.innerHTML = images
+    .map((item) => {
+      const src = typeof item === "string" ? item : item.src;
+      const alt = typeof item === "string" ? "웨딩 앨범 사진" : item.alt || "웨딩 앨범 사진";
+      return `<img src="${escapeHtml(src)}" alt="${escapeHtml(alt)}" loading="lazy" />`;
+    })
+    .join("");
+};
+
+const copyText = async (text) => {
+  if (navigator.clipboard?.writeText) {
+    await navigator.clipboard.writeText(text);
+    return;
+  }
+
+  const textarea = document.createElement("textarea");
+  textarea.value = text;
+  textarea.setAttribute("readonly", "");
+  textarea.style.position = "fixed";
+  textarea.style.opacity = "0";
+  document.body.append(textarea);
+  textarea.select();
+  document.execCommand("copy");
+  textarea.remove();
+};
+
+const renderAccounts = () => {
+  const accounts = Array.isArray(siteData.accounts) ? siteData.accounts : [];
+
+  accountList.innerHTML = accounts
+    .map(
+      (account, index) => `
+        <article class="account-card">
+          <div>
+            <span>${escapeHtml(account.side)}</span>
+            <strong>${escapeHtml(account.bank)} ${escapeHtml(account.number)}</strong>
+            <p>${escapeHtml(account.holder)} · ${escapeHtml(account.name)}</p>
+          </div>
+          <button type="button" data-copy-account="${index}">복사</button>
+        </article>
+      `,
+    )
+    .join("");
+};
+
+accountList.addEventListener("click", async (event) => {
+  const button = event.target.closest("[data-copy-account]");
+  if (!button) return;
+
+  const account = siteData.accounts[Number(button.dataset.copyAccount)];
+  const copyValue = `${account.bank} ${account.number} ${account.holder}`;
+
+  try {
+    await copyText(copyValue);
+    button.textContent = "복사됨";
+    setTimeout(() => {
+      button.textContent = "복사";
+    }, 1400);
+  } catch {
+    button.textContent = "실패";
+    setTimeout(() => {
+      button.textContent = "복사";
+    }, 1400);
+  }
+});
 
 const renderMessages = (messages) => {
   if (!messages.length) {
@@ -63,7 +145,7 @@ const loadMessages = async () => {
       {
         name: "예시",
         attendance: "참석 예정",
-        message: "Supabase URL과 anon key를 config.js에 넣으면 실제 방명록으로 연결됩니다.",
+        message: "Supabase URL과 anon key를 설정하면 실제 방명록으로 연결됩니다.",
         created_at: new Date().toISOString(),
       },
     ]);
@@ -89,7 +171,7 @@ form.addEventListener("submit", async (event) => {
   event.preventDefault();
 
   if (!client) {
-    setStatus("먼저 config.js에 Supabase 설정을 입력해 주세요.");
+    setStatus("먼저 Supabase 설정을 입력해 주세요.");
     return;
   }
 
@@ -117,4 +199,6 @@ form.addEventListener("submit", async (event) => {
   await loadMessages();
 });
 
+renderAlbum();
+renderAccounts();
 loadMessages();
