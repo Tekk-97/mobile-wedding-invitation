@@ -375,31 +375,34 @@ button {
   text-align: center;
 }
 
-.naver-map {
-  display: grid;
+.map-frame {
+  position: relative;
+  display: block;
   min-height: 230px;
   margin-top: 24px;
   overflow: hidden;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--white);
+  color: inherit;
+  text-decoration: none;
 }
 
-.naver-map__fallback {
-  display: grid;
-  gap: 8px;
-  place-items: center;
-  padding: 24px;
+.map-frame iframe {
+  display: block;
+  width: 100%;
+  height: 230px;
+  border: 0;
+  pointer-events: none;
 }
 
-.naver-map__fallback strong {
-  font-family: "Gowun Batang", serif;
-  font-size: 1.5rem;
-}
-
-.naver-map__fallback span {
+.map-frame__caption {
+  display: block;
+  padding: 10px 12px;
+  background: rgba(255, 250, 245, 0.94);
   color: var(--muted);
-  line-height: 1.6;
+  font-size: 0.82rem;
+  line-height: 1.5;
 }
 
 .map-actions {
@@ -530,8 +533,8 @@ button {
   border: 1px solid var(--line);
   border-radius: 6px;
   padding: 0 10px;
-  background: #ffeb00;
-  color: #191919;
+  background: var(--white);
+  color: var(--ink);
   font-size: 0.92rem;
   font-weight: 700;
 }
@@ -539,21 +542,37 @@ button {
 .kakao-pay-mark {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
+  gap: 4px;
   font-weight: 700;
   letter-spacing: 0;
 }
 
 .kakao-pay-mark::before {
   content: "";
-  width: 20px;
-  height: 20px;
-  border-radius: 7px;
-  background: #191919;
+  width: 18px;
+  height: 18px;
+  margin-right: 4px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 45%, #fff 0 22%, transparent 23%),
+    #0064ff;
 }
 
-.kakao-pay-mark::after {
-  content: "카카오페이 송금";
+.kakao-pay-mark b {
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.kakao-pay-mark strong {
+  color: #0064ff;
+  font-weight: 900;
+}
+
+.kakao-pay-mark em {
+  margin-left: 5px;
+  color: var(--muted);
+  font-style: normal;
+  font-weight: 700;
 }
 
 .share {

@@ -16,6 +16,7 @@ window.WEDDING_SITE_DATA = {
     address: "서울특별시 강남구 언주로 564",
     latitude: 37.508747,
     longitude: 127.035499,
+    embedUrl: "https://map.naver.com/p/search/라움아트센터",
     kakaoMapUrl: "https://map.kakao.com/link/search/라움아트센터",
     naverMapUrl: "https://map.naver.com/p/search/라움아트센터",
   },

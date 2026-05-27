@@ -24,7 +24,7 @@ const albumViewerCaption = document.querySelector("#album-viewer-caption");
 const albumCloseButton = document.querySelector(".album-viewer__close");
 const albumPrevButton = document.querySelector(".album-viewer__nav--prev");
 const albumNextButton = document.querySelector(".album-viewer__nav--next");
-const naverMapEl = document.querySelector("#naver-map");
+const mapFrameLink = document.querySelector("#map-frame-link");
 const ddayLabel = document.querySelector("#dday-label");
 const welcomeMessage = document.querySelector("#welcome-message");
 const shareStatus = document.querySelector("#share-status");
@@ -165,53 +165,14 @@ document.addEventListener("keydown", (event) => {
   if (event.key === "ArrowRight") showAlbumImage(currentAlbumIndex + 1);
 });
 
-const loadNaverMapScript = () =>
-  new Promise((resolve, reject) => {
-    if (window.naver?.maps) {
-      resolve();
-      return;
-    }
-
-    if (!config.naverMapNcpKeyId) {
-      reject(new Error("missing naver map key"));
-      return;
-    }
-
-    const script = document.createElement("script");
-    script.src = `https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=${encodeURIComponent(config.naverMapNcpKeyId)}`;
-    script.async = true;
-    script.onload = resolve;
-    script.onerror = reject;
-    document.head.append(script);
-  });
-
-const renderNaverMap = async () => {
+const renderMapFrame = () => {
   const venue = siteData.venue || {};
+  const url = venue.embedUrl || venue.naverMapUrl;
+  if (!url) return;
 
-  try {
-    await loadNaverMapScript();
-    const position = new window.naver.maps.LatLng(venue.latitude, venue.longitude);
-    const map = new window.naver.maps.Map(naverMapEl, {
-      center: position,
-      zoom: 16,
-      scaleControl: false,
-      logoControl: false,
-      mapDataControl: false,
-    });
-
-    new window.naver.maps.Marker({
-      position,
-      map,
-      title: venue.name,
-    });
-  } catch {
-    naverMapEl.innerHTML = `
-      <div class="naver-map__fallback">
-        <strong>${escapeHtml(venue.name || "예식장")}</strong>
-        <span>${escapeHtml(venue.address || "네이버 지도 API 키를 설정하면 지도가 표시됩니다.")}</span>
-      </div>
-    `;
-  }
+  mapFrameLink.href = venue.naverMapUrl || url;
+  mapFrameLink.querySelector("iframe").src = url;
+  mapFrameLink.querySelector("iframe").title = `${venue.name || "예식장"} 지도`;
 };
 
 const revealSections = () => {
@@ -268,7 +229,7 @@ const renderAccounts = () => {
           <button type="button" data-copy-account="${index}">복사</button>
           <div class="account-card__pay">
             <button type="button" data-pay-account="${index}" data-pay-type="kakaoPayUrl" aria-label="카카오페이 송금">
-              <span class="kakao-pay-mark">pay</span>
+              <span class="kakao-pay-mark"><b>kakao</b><strong>pay</strong><em>송금</em></span>
             </button>
           </div>
         </article>
@@ -314,7 +275,7 @@ accountList.addEventListener("click", async (event) => {
   await copyText(copyValue);
   button.textContent = "계좌 복사됨";
   setTimeout(() => {
-    button.innerHTML = '<span class="kakao-pay-mark">pay</span>';
+    button.innerHTML = '<span class="kakao-pay-mark"><b>kakao</b><strong>pay</strong><em>송금</em></span>';
   }, 1400);
 });
 
@@ -545,6 +506,6 @@ copyLinkButton.addEventListener("click", async () => {
 renderDday();
 renderAlbum();
 renderAccounts();
-renderNaverMap();
+renderMapFrame();
 revealSections();
 loadMessages();

@@ -42,7 +42,6 @@ on conflict (user_id) do update set email = excluded.email;
 
 - `SUPABASE_URL`: Supabase Project URL
 - `SUPABASE_ANON_KEY`: Supabase anon public key
-- `NAVER_MAP_NCP_KEY_ID`: 네이버 지도 JavaScript API용 NCP Key ID. 없으면 장소 카드가 표시됩니다.
 
 값을 넣은 뒤 `Actions > Deploy GitHub Pages > Run workflow`를 실행하거나, 아무 파일이나 수정해서 `main`에 push하면 다시 배포됩니다.
 
@@ -86,7 +85,6 @@ albumImages: [
 - [ ] 계좌번호, 은행, 예금주 변경: `site-data.js`의 `accounts`
 - [ ] 카카오페이 송금 링크 변경: `site-data.js`의 `kakaoPayUrl`
 - [ ] 예식장 좌표와 지도 링크 변경: `site-data.js`의 `venue`
-- [ ] 네이버 지도 표시를 원하면 GitHub Secret `NAVER_MAP_NCP_KEY_ID` 등록
 - [ ] Supabase SQL 실행: `supabase-schema.sql`
 - [ ] SQL 실행 후 사이트를 새로고침해서 방명록 저장 테스트
 - [ ] GitHub Secrets 등록: `SUPABASE_URL`, `SUPABASE_ANON_KEY`

@@ -122,12 +122,15 @@
         <p class="eyebrow">오시는 길</p>
         <h2>라움아트센터</h2>
         <p>서울특별시 강남구 언주로 564</p>
-        <div id="naver-map" class="naver-map" aria-label="예식장 위치 지도">
-          <div class="naver-map__fallback">
-            <strong>라움아트센터</strong>
-            <span>네이버 지도 API 키를 설정하면 지도가 표시됩니다.</span>
-          </div>
-        </div>
+        <a id="map-frame-link" class="map-frame" href="https://map.naver.com/p/search/라움아트센터" target="_blank" rel="noreferrer" aria-label="네이버 지도에서 위치 보기">
+          <iframe
+            title="라움아트센터 지도"
+            src="https://map.naver.com/p/search/라움아트센터"
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+          ></iframe>
+          <span class="map-frame__caption">지도가 열리지 않으면 탭해서 네이버 지도에서 확인하세요.</span>
+        </a>
         <div class="map-actions">
           <a class="app-icon app-icon--kakao" href="https://map.kakao.com/link/search/라움아트센터" target="_blank" rel="noreferrer" aria-label="카카오맵 열기" title="카카오맵"></a>
           <a class="app-icon app-icon--naver" href="https://map.naver.com/p/search/라움아트센터" target="_blank" rel="noreferrer" aria-label="네이버지도 열기" title="네이버지도"></a>
@@ -148,11 +151,9 @@
         <div class="share-actions">
           <button type="button" id="share-native" aria-label="공유하기" title="공유하기">
             <svg viewBox="0 0 24 24" aria-hidden="true">
-              <circle cx="18" cy="5" r="3" />
-              <circle cx="6" cy="12" r="3" />
-              <circle cx="18" cy="19" r="3" />
-              <path d="m8.6 10.5 6.8-4" />
-              <path d="m8.6 13.5 6.8 4" />
+              <path d="M12 3v12" />
+              <path d="m7 8 5-5 5 5" />
+              <path d="M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6" />
             </svg>
           </button>
           <button type="button" id="copy-link" aria-label="링크 복사" title="링크 복사">
