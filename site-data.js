@@ -44,8 +44,7 @@ window.WEDDING_SITE_DATA = {
       bank: "국민은행",
       number: "123456-78-901234",
       holder: "김민준",
-      kakaoPayUrl: "",
-      tossUrl: "",
+      kakaoPayUrl: "http://kkoto.dev.9rum.cc/uWtfqSkDXe",
     },
     {
       side: "신부측",
@@ -53,8 +52,7 @@ window.WEDDING_SITE_DATA = {
       bank: "신한은행",
       number: "110-123-456789",
       holder: "이서연",
-      kakaoPayUrl: "",
-      tossUrl: "",
+      kakaoPayUrl: "http://kkoto.dev.9rum.cc/uWtfqSkDXe",
     },
   ],
 };

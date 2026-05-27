@@ -42,7 +42,6 @@ on conflict (user_id) do update set email = excluded.email;
 
 - `SUPABASE_URL`: Supabase Project URL
 - `SUPABASE_ANON_KEY`: Supabase anon public key
-- `KAKAO_JS_KEY`: 카카오톡 공유용 JavaScript key. 선택 사항이며 없으면 링크 복사로 동작합니다.
 
 값을 넣은 뒤 `Actions > Deploy GitHub Pages > Run workflow`를 실행하거나, 아무 파일이나 수정해서 `main`에 push하면 다시 배포됩니다.
 
@@ -84,9 +83,8 @@ albumImages: [
 - [ ] 대표 이미지 변경: `index.html`의 `.hero__image`
 - [ ] 앨범 사진 URL 변경: `site-data.js`의 `albumImages`
 - [ ] 계좌번호, 은행, 예금주 변경: `site-data.js`의 `accounts`
-- [ ] 카카오페이/토스 송금 링크가 있으면 `site-data.js`의 `kakaoPayUrl`, `tossUrl`에 입력
+- [ ] 카카오페이 송금 링크 변경: `site-data.js`의 `kakaoPayUrl`
 - [ ] 예식장 좌표와 지도 링크 변경: `site-data.js`의 `venue`
-- [ ] 카카오톡 공유를 쓸 경우 GitHub Secret `KAKAO_JS_KEY` 등록
 - [ ] Supabase SQL 실행: `supabase-schema.sql`
 - [ ] SQL 실행 후 사이트를 새로고침해서 방명록 저장 테스트
 - [ ] GitHub Secrets 등록: `SUPABASE_URL`, `SUPABASE_ANON_KEY`

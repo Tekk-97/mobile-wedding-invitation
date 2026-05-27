@@ -27,7 +27,6 @@ const albumNextButton = document.querySelector(".album-viewer__nav--next");
 const ddayLabel = document.querySelector("#dday-label");
 const welcomeMessage = document.querySelector("#welcome-message");
 const shareStatus = document.querySelector("#share-status");
-const shareKakaoButton = document.querySelector("#share-kakao");
 const shareNativeButton = document.querySelector("#share-native");
 const copyLinkButton = document.querySelector("#copy-link");
 let currentAlbumIndex = 0;
@@ -206,8 +205,9 @@ const renderAccounts = () => {
           </div>
           <button type="button" data-copy-account="${index}">복사</button>
           <div class="account-card__pay">
-            <button type="button" data-pay-account="${index}" data-pay-type="kakaoPayUrl">카카오페이</button>
-            <button type="button" data-pay-account="${index}" data-pay-type="tossUrl">토스</button>
+            <button type="button" data-pay-account="${index}" data-pay-type="kakaoPayUrl" aria-label="카카오페이 송금">
+              <span class="kakao-pay-mark">pay</span>
+            </button>
           </div>
         </article>
       `,
@@ -252,7 +252,7 @@ accountList.addEventListener("click", async (event) => {
   await copyText(copyValue);
   button.textContent = "계좌 복사됨";
   setTimeout(() => {
-    button.textContent = button.dataset.payType === "kakaoPayUrl" ? "카카오페이" : "토스";
+    button.innerHTML = '<span class="kakao-pay-mark">pay</span>';
   }, 1400);
 });
 
@@ -478,42 +478,6 @@ shareNativeButton.addEventListener("click", async () => {
 copyLinkButton.addEventListener("click", async () => {
   await copyText(getShareUrl());
   setShareStatus("초대장 링크를 복사했습니다.");
-});
-
-shareKakaoButton.addEventListener("click", async () => {
-  const payload = sharePayload();
-
-  if (!config.kakaoJsKey || !window.Kakao?.Share) {
-    await copyText(payload.url);
-    setShareStatus("카카오 JavaScript 키가 없어 링크를 복사했습니다.");
-    return;
-  }
-
-  if (!window.Kakao.isInitialized()) {
-    window.Kakao.init(config.kakaoJsKey);
-  }
-
-  window.Kakao.Share.sendDefault({
-    objectType: "feed",
-    content: {
-      title: payload.title,
-      description: payload.text,
-      imageUrl: siteData.shareImage,
-      link: {
-        mobileWebUrl: payload.url,
-        webUrl: payload.url,
-      },
-    },
-    buttons: [
-      {
-        title: "초대장 보기",
-        link: {
-          mobileWebUrl: payload.url,
-          webUrl: payload.url,
-        },
-      },
-    ],
-  });
 });
 
 renderDday();

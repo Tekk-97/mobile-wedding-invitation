@@ -19,7 +19,6 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="./styles.css" />
-    <script defer src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.5/kakao.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="./site-data.js"></script>
     <script src="./config.js"></script>
@@ -141,9 +140,19 @@
         <p class="eyebrow">Share</p>
         <h2>초대장 공유하기</h2>
         <div class="share-actions">
-          <button type="button" id="share-kakao">카카오톡</button>
-          <button type="button" id="share-native">공유</button>
-          <button type="button" id="copy-link">링크 복사</button>
+          <button type="button" id="share-native" aria-label="공유하기" title="공유하기">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7" />
+              <path d="M12 16V4" />
+              <path d="m7 9 5-5 5 5" />
+            </svg>
+          </button>
+          <button type="button" id="copy-link" aria-label="링크 복사" title="링크 복사">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="9" y="9" width="11" height="11" rx="2" />
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+            </svg>
+          </button>
         </div>
         <p id="share-status" class="status" role="status"></p>
       </section>
