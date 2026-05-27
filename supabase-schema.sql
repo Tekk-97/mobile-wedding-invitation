@@ -10,6 +10,11 @@ create table if not exists public.guestbook (
 
 create extension if not exists pgcrypto;
 
+drop function if exists public.create_guestbook_entry(text, text, text, text);
+drop function if exists public.update_guestbook_entry(bigint, text, text, text, text);
+drop function if exists public.delete_guestbook_entry(bigint, text);
+drop function if exists public.list_guestbook_entries(text);
+
 alter table public.guestbook
   add column if not exists edit_code_hash text;
 
