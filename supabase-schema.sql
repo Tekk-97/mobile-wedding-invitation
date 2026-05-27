@@ -3,8 +3,21 @@ create table if not exists public.guestbook (
   name text not null,
   attendance text not null default '참석 예정',
   message text not null,
+  edit_code_hash text,
   created_at timestamptz not null default now()
 );
+
+create extension if not exists pgcrypto;
+
+alter table public.guestbook
+  add column if not exists edit_code_hash text;
+
+update public.guestbook
+set edit_code_hash = crypt(gen_random_uuid()::text, gen_salt('bf'))
+where edit_code_hash is null;
+
+alter table public.guestbook
+  alter column edit_code_hash set not null;
 
 do $$
 declare
@@ -45,16 +58,6 @@ on public.guestbook
 for select
 to anon, authenticated
 using (true);
-
-create policy "Anyone can write guestbook"
-on public.guestbook
-for insert
-to anon
-with check (
-  char_length(name) between 1 and 20
-  and attendance in ('참석 예정', '불참', '미정')
-  and char_length(message) between 1 and 300
-);
 
 create policy "Admins can update guestbook"
 on public.guestbook
@@ -98,6 +101,103 @@ using (user_id = auth.uid());
 
 create index if not exists guestbook_created_at_idx
 on public.guestbook (created_at desc);
+
+create or replace function public.create_guestbook_entry(
+  p_name text,
+  p_attendance text,
+  p_message text,
+  p_edit_password text
+)
+returns bigint
+language plpgsql
+security definer
+set search_path = public, pg_temp
+as $$
+declare
+  new_id bigint;
+begin
+  if char_length(p_name) not between 1 and 20 then
+    raise exception 'invalid name';
+  end if;
+
+  if p_attendance not in ('참석 예정', '불참', '미정') then
+    raise exception 'invalid attendance';
+  end if;
+
+  if char_length(p_message) not between 1 and 300 then
+    raise exception 'invalid message';
+  end if;
+
+  if char_length(p_edit_password) not between 4 and 30 then
+    raise exception 'invalid password';
+  end if;
+
+  insert into public.guestbook (name, attendance, message, edit_code_hash)
+  values (p_name, p_attendance, p_message, crypt(p_edit_password, gen_salt('bf')))
+  returning id into new_id;
+
+  return new_id;
+end;
+$$;
+
+create or replace function public.update_guestbook_entry(
+  p_id bigint,
+  p_name text,
+  p_attendance text,
+  p_message text,
+  p_edit_password text
+)
+returns boolean
+language plpgsql
+security definer
+set search_path = public, pg_temp
+as $$
+begin
+  if char_length(p_name) not between 1 and 20 then
+    return false;
+  end if;
+
+  if p_attendance not in ('참석 예정', '불참', '미정') then
+    return false;
+  end if;
+
+  if char_length(p_message) not between 1 and 300 then
+    return false;
+  end if;
+
+  update public.guestbook
+  set
+    name = p_name,
+    attendance = p_attendance,
+    message = p_message
+  where id = p_id
+    and edit_code_hash = crypt(p_edit_password, edit_code_hash);
+
+  return found;
+end;
+$$;
+
+create or replace function public.delete_guestbook_entry(
+  p_id bigint,
+  p_edit_password text
+)
+returns boolean
+language plpgsql
+security definer
+set search_path = public, pg_temp
+as $$
+begin
+  delete from public.guestbook
+  where id = p_id
+    and edit_code_hash = crypt(p_edit_password, edit_code_hash);
+
+  return found;
+end;
+$$;
+
+grant execute on function public.create_guestbook_entry(text, text, text, text) to anon, authenticated;
+grant execute on function public.update_guestbook_entry(bigint, text, text, text, text) to anon, authenticated;
+grant execute on function public.delete_guestbook_entry(bigint, text) to anon, authenticated;
 
 -- 관리자 설정:
 -- 1. Supabase Dashboard > Authentication > Users에서 관리자 이메일/비밀번호 계정을 만듭니다.

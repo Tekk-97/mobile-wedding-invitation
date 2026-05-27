@@ -16,8 +16,17 @@ const listEl = document.querySelector("#guestbook-list");
 const nameInput = document.querySelector("#guest-name");
 const attendanceInput = document.querySelector("#guest-attendance");
 const messageInput = document.querySelector("#guest-message");
+const passwordInput = document.querySelector("#guest-password");
 const albumGrid = document.querySelector("#album-grid");
 const accountList = document.querySelector("#account-list");
+const albumViewer = document.querySelector("#album-viewer");
+const albumViewerImage = document.querySelector("#album-viewer-image");
+const albumViewerCaption = document.querySelector("#album-viewer-caption");
+const albumCloseButton = document.querySelector(".album-viewer__close");
+const albumPrevButton = document.querySelector(".album-viewer__nav--prev");
+const albumNextButton = document.querySelector(".album-viewer__nav--next");
+let currentAlbumIndex = 0;
+let touchStartX = 0;
 
 const setStatus = (message) => {
   statusEl.textContent = message;
@@ -56,10 +65,71 @@ const renderAlbum = () => {
     .map((item) => {
       const src = typeof item === "string" ? item : item.src;
       const alt = typeof item === "string" ? "웨딩 앨범 사진" : item.alt || "웨딩 앨범 사진";
-      return `<img src="${escapeHtml(src)}" alt="${escapeHtml(alt)}" loading="lazy" />`;
+      return `
+        <button type="button" class="album__item" data-album-index="${index}">
+          <img src="${escapeHtml(src)}" alt="${escapeHtml(alt)}" loading="lazy" />
+        </button>
+      `;
     })
     .join("");
 };
+
+const getAlbumItem = (index) => {
+  const images = Array.isArray(siteData.albumImages) ? siteData.albumImages : [];
+  const item = images[index];
+  if (!item) return null;
+  return {
+    src: typeof item === "string" ? item : item.src,
+    alt: typeof item === "string" ? "웨딩 앨범 사진" : item.alt || "웨딩 앨범 사진",
+  };
+};
+
+const showAlbumImage = (index) => {
+  const images = Array.isArray(siteData.albumImages) ? siteData.albumImages : [];
+  if (!images.length) return;
+
+  currentAlbumIndex = (index + images.length) % images.length;
+  const item = getAlbumItem(currentAlbumIndex);
+  albumViewerImage.src = item.src;
+  albumViewerImage.alt = item.alt;
+  albumViewerCaption.textContent = item.alt;
+  albumViewer.hidden = false;
+  document.body.classList.add("is-viewing-album");
+};
+
+const closeAlbum = () => {
+  albumViewer.hidden = true;
+  albumViewerImage.src = "";
+  document.body.classList.remove("is-viewing-album");
+};
+
+albumGrid.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-album-index]");
+  if (!button) return;
+  showAlbumImage(Number(button.dataset.albumIndex));
+});
+
+albumCloseButton.addEventListener("click", closeAlbum);
+albumPrevButton.addEventListener("click", () => showAlbumImage(currentAlbumIndex - 1));
+albumNextButton.addEventListener("click", () => showAlbumImage(currentAlbumIndex + 1));
+albumViewer.addEventListener("click", (event) => {
+  if (event.target === albumViewer) closeAlbum();
+});
+albumViewer.addEventListener("touchstart", (event) => {
+  touchStartX = event.changedTouches[0].clientX;
+});
+albumViewer.addEventListener("touchend", (event) => {
+  const touchEndX = event.changedTouches[0].clientX;
+  const distance = touchEndX - touchStartX;
+  if (Math.abs(distance) < 40) return;
+  showAlbumImage(currentAlbumIndex + (distance < 0 ? 1 : -1));
+});
+document.addEventListener("keydown", (event) => {
+  if (albumViewer.hidden) return;
+  if (event.key === "Escape") closeAlbum();
+  if (event.key === "ArrowLeft") showAlbumImage(currentAlbumIndex - 1);
+  if (event.key === "ArrowRight") showAlbumImage(currentAlbumIndex + 1);
+});
 
 const copyText = async (text) => {
   if (navigator.clipboard?.writeText) {
@@ -133,6 +203,35 @@ const renderMessages = (messages) => {
             <span>${escapeHtml(item.attendance)} · ${formatDate(item.created_at)}</span>
           </div>
           <p>${escapeHtml(item.message)}</p>
+          <div class="message__actions">
+            <button type="button" data-edit-open="${item.id}">수정/삭제</button>
+          </div>
+          <form class="message-editor" data-editor="${item.id}" hidden>
+            <label>
+              이름
+              <input data-edit-field="name" maxlength="20" value="${escapeHtml(item.name)}" required />
+            </label>
+            <label>
+              참석 여부
+              <select data-edit-field="attendance">
+                <option value="참석 예정" ${item.attendance === "참석 예정" ? "selected" : ""}>참석 예정</option>
+                <option value="불참" ${item.attendance === "불참" ? "selected" : ""}>불참</option>
+                <option value="미정" ${item.attendance === "미정" ? "selected" : ""}>미정</option>
+              </select>
+            </label>
+            <label>
+              메시지
+              <textarea data-edit-field="message" maxlength="300" rows="3" required>${escapeHtml(item.message)}</textarea>
+            </label>
+            <label>
+              작성 시 입력한 비밀번호
+              <input data-edit-field="password" type="password" minlength="4" maxlength="30" required />
+            </label>
+            <div class="message-editor__actions">
+              <button type="submit">저장</button>
+              <button type="button" data-delete-entry="${item.id}" class="danger-button">삭제</button>
+            </div>
+          </form>
         </article>
       `,
     )
@@ -155,7 +254,7 @@ const loadMessages = async () => {
 
   const { data, error } = await client
     .from("guestbook")
-    .select("name, attendance, message, created_at")
+    .select("id, name, attendance, message, created_at")
     .order("created_at", { ascending: false })
     .limit(50);
 
@@ -180,12 +279,13 @@ form.addEventListener("submit", async (event) => {
   setStatus("저장 중입니다...");
 
   const payload = {
-    name: nameInput.value.trim(),
-    attendance: attendanceInput.value,
-    message: messageInput.value.trim(),
+    p_name: nameInput.value.trim(),
+    p_attendance: attendanceInput.value,
+    p_message: messageInput.value.trim(),
+    p_edit_password: passwordInput.value,
   };
 
-  const { error } = await client.from("guestbook").insert(payload);
+  const { error } = await client.rpc("create_guestbook_entry", payload);
 
   button.disabled = false;
 
@@ -196,6 +296,73 @@ form.addEventListener("submit", async (event) => {
 
   form.reset();
   setStatus("소중한 마음이 저장되었습니다.");
+  await loadMessages();
+});
+
+listEl.addEventListener("click", async (event) => {
+  if (!client) {
+    setStatus("먼저 Supabase 설정을 입력해 주세요.");
+    return;
+  }
+
+  const openButton = event.target.closest("[data-edit-open]");
+  if (openButton) {
+    const editor = listEl.querySelector(`[data-editor="${openButton.dataset.editOpen}"]`);
+    editor.hidden = !editor.hidden;
+    return;
+  }
+
+  const deleteButton = event.target.closest("[data-delete-entry]");
+  if (!deleteButton) return;
+
+  const editor = deleteButton.closest(".message-editor");
+  const password = editor.querySelector('[data-edit-field="password"]').value;
+  if (!password) {
+    setStatus("작성 시 입력한 비밀번호를 입력해 주세요.");
+    return;
+  }
+
+  const { data, error } = await client.rpc("delete_guestbook_entry", {
+    p_id: Number(deleteButton.dataset.deleteEntry),
+    p_edit_password: password,
+  });
+
+  if (error || !data) {
+    setStatus("삭제하지 못했습니다. 비밀번호를 확인해 주세요.");
+    return;
+  }
+
+  setStatus("방명록을 삭제했습니다.");
+  await loadMessages();
+});
+
+listEl.addEventListener("submit", async (event) => {
+  const editor = event.target.closest(".message-editor");
+  if (!editor) return;
+  event.preventDefault();
+
+  if (!client) {
+    setStatus("먼저 Supabase 설정을 입력해 주세요.");
+    return;
+  }
+
+  const id = Number(editor.dataset.editor);
+  const payload = {
+    p_id: id,
+    p_name: editor.querySelector('[data-edit-field="name"]').value.trim(),
+    p_attendance: editor.querySelector('[data-edit-field="attendance"]').value,
+    p_message: editor.querySelector('[data-edit-field="message"]').value.trim(),
+    p_edit_password: editor.querySelector('[data-edit-field="password"]').value,
+  };
+
+  const { data, error } = await client.rpc("update_guestbook_entry", payload);
+
+  if (error || !data) {
+    setStatus("수정하지 못했습니다. 비밀번호를 확인해 주세요.");
+    return;
+  }
+
+  setStatus("방명록을 수정했습니다.");
   await loadMessages();
 });
 

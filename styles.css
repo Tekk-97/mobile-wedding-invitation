@@ -29,6 +29,10 @@ body {
   font-family: "Noto Sans KR", system-ui, sans-serif;
 }
 
+body.is-viewing-album {
+  overflow: hidden;
+}
+
 a {
   color: inherit;
 }
@@ -253,11 +257,73 @@ button {
   margin-top: 24px;
 }
 
-.album__grid img {
+.album__item {
+  display: block;
+  min-height: 0;
+  border: 0;
+  border-radius: 8px;
+  padding: 0;
+  background: transparent;
+  overflow: hidden;
+}
+
+.album__item img {
   width: 100%;
   aspect-ratio: 1;
-  border-radius: 8px;
   object-fit: cover;
+}
+
+.album-viewer {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  place-items: center;
+  padding: 54px 18px 28px;
+  background: rgba(25, 20, 17, 0.92);
+}
+
+.album-viewer img {
+  max-width: min(100%, 720px);
+  max-height: 72vh;
+  border-radius: 8px;
+  object-fit: contain;
+}
+
+.album-viewer p {
+  margin: 14px 0 0;
+  color: var(--white);
+  text-align: center;
+}
+
+.album-viewer__close,
+.album-viewer__nav {
+  position: absolute;
+  width: 44px;
+  min-height: 44px;
+  border-color: rgba(255, 255, 255, 0.38);
+  background: rgba(255, 250, 245, 0.14);
+  color: white;
+  font-size: 1.8rem;
+}
+
+.album-viewer__close {
+  top: 16px;
+  right: 16px;
+}
+
+.album-viewer__nav {
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.album-viewer__nav--prev {
+  left: 14px;
+}
+
+.album-viewer__nav--next {
+  right: 14px;
 }
 
 .album__empty {
@@ -410,6 +476,33 @@ button:disabled {
   margin: 10px 0 0;
   line-height: 1.7;
   white-space: pre-wrap;
+}
+
+.message__actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 14px;
+}
+
+.message__actions button {
+  width: auto;
+  min-height: 36px;
+  background: transparent;
+  color: var(--sage);
+}
+
+.message-editor {
+  display: grid;
+  gap: 12px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+
+.message-editor__actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
 }
 
 .admin-shell {

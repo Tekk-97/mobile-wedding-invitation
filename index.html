@@ -97,6 +97,13 @@
         <p class="eyebrow">Album</p>
         <h2>우리의 순간들</h2>
         <div id="album-grid" class="album__grid"></div>
+        <div id="album-viewer" class="album-viewer" hidden>
+          <button class="album-viewer__close" type="button" aria-label="닫기">×</button>
+          <button class="album-viewer__nav album-viewer__nav--prev" type="button" aria-label="이전 사진">‹</button>
+          <img id="album-viewer-image" src="" alt="" />
+          <button class="album-viewer__nav album-viewer__nav--next" type="button" aria-label="다음 사진">›</button>
+          <p id="album-viewer-caption"></p>
+        </div>
       </section>
 
       <section class="section location">
@@ -135,6 +142,18 @@
           <label>
             메시지
             <textarea id="guest-message" name="message" maxlength="300" rows="4" required></textarea>
+          </label>
+          <label>
+            수정/삭제 비밀번호
+            <input
+              id="guest-password"
+              name="edit_password"
+              type="password"
+              minlength="4"
+              maxlength="30"
+              autocomplete="new-password"
+              required
+            />
           </label>
           <button type="submit">방명록 남기기</button>
           <p id="form-status" class="status" role="status"></p>
