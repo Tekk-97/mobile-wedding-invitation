@@ -16,7 +16,6 @@ const listEl = document.querySelector("#guestbook-list");
 const nameInput = document.querySelector("#guest-name");
 const attendanceInput = document.querySelector("#guest-attendance");
 const messageInput = document.querySelector("#guest-message");
-const passwordInput = document.querySelector("#guest-password");
 const albumGrid = document.querySelector("#album-grid");
 const accountList = document.querySelector("#account-list");
 const albumViewer = document.querySelector("#album-viewer");
@@ -27,6 +26,18 @@ const albumPrevButton = document.querySelector(".album-viewer__nav--prev");
 const albumNextButton = document.querySelector(".album-viewer__nav--next");
 let currentAlbumIndex = 0;
 let touchStartX = 0;
+
+const getDeviceToken = () => {
+  const key = "wedding_guestbook_device_token";
+  const existing = localStorage.getItem(key);
+  if (existing) return existing;
+
+  const token =
+    crypto.randomUUID?.() ||
+    `${Date.now()}-${Math.random().toString(36).slice(2)}-${Math.random().toString(36).slice(2)}`;
+  localStorage.setItem(key, token);
+  return token;
+};
 
 const setStatus = (message) => {
   statusEl.textContent = message;
@@ -62,7 +73,7 @@ const renderAlbum = () => {
   }
 
   albumGrid.innerHTML = images
-    .map((item) => {
+    .map((item, index) => {
       const src = typeof item === "string" ? item : item.src;
       const alt = typeof item === "string" ? "웨딩 앨범 사진" : item.alt || "웨딩 앨범 사진";
       return `
@@ -223,10 +234,6 @@ const renderMessages = (messages) => {
               메시지
               <textarea data-edit-field="message" maxlength="300" rows="3" required>${escapeHtml(item.message)}</textarea>
             </label>
-            <label>
-              작성 시 입력한 비밀번호
-              <input data-edit-field="password" type="password" minlength="4" maxlength="30" required />
-            </label>
             <div class="message-editor__actions">
               <button type="submit">저장</button>
               <button type="button" data-delete-entry="${item.id}" class="danger-button">삭제</button>
@@ -282,7 +289,7 @@ form.addEventListener("submit", async (event) => {
     p_name: nameInput.value.trim(),
     p_attendance: attendanceInput.value,
     p_message: messageInput.value.trim(),
-    p_edit_password: passwordInput.value,
+    p_owner_token: getDeviceToken(),
   };
 
   const { error } = await client.rpc("create_guestbook_entry", payload);
@@ -315,20 +322,13 @@ listEl.addEventListener("click", async (event) => {
   const deleteButton = event.target.closest("[data-delete-entry]");
   if (!deleteButton) return;
 
-  const editor = deleteButton.closest(".message-editor");
-  const password = editor.querySelector('[data-edit-field="password"]').value;
-  if (!password) {
-    setStatus("작성 시 입력한 비밀번호를 입력해 주세요.");
-    return;
-  }
-
   const { data, error } = await client.rpc("delete_guestbook_entry", {
     p_id: Number(deleteButton.dataset.deleteEntry),
-    p_edit_password: password,
+    p_owner_token: getDeviceToken(),
   });
 
   if (error || !data) {
-    setStatus("삭제하지 못했습니다. 비밀번호를 확인해 주세요.");
+    setStatus("이 브라우저에서 작성한 글만 삭제할 수 있습니다.");
     return;
   }
 
@@ -352,13 +352,13 @@ listEl.addEventListener("submit", async (event) => {
     p_name: editor.querySelector('[data-edit-field="name"]').value.trim(),
     p_attendance: editor.querySelector('[data-edit-field="attendance"]').value,
     p_message: editor.querySelector('[data-edit-field="message"]').value.trim(),
-    p_edit_password: editor.querySelector('[data-edit-field="password"]').value,
+    p_owner_token: getDeviceToken(),
   };
 
   const { data, error } = await client.rpc("update_guestbook_entry", payload);
 
   if (error || !data) {
-    setStatus("수정하지 못했습니다. 비밀번호를 확인해 주세요.");
+    setStatus("이 브라우저에서 작성한 글만 수정할 수 있습니다.");
     return;
   }
 

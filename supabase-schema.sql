@@ -4,6 +4,7 @@ create table if not exists public.guestbook (
   attendance text not null default '참석 예정',
   message text not null,
   edit_code_hash text,
+  owner_token_hash text,
   created_at timestamptz not null default now()
 );
 
@@ -12,12 +13,22 @@ create extension if not exists pgcrypto;
 alter table public.guestbook
   add column if not exists edit_code_hash text;
 
+alter table public.guestbook
+  add column if not exists owner_token_hash text;
+
 update public.guestbook
 set edit_code_hash = crypt(gen_random_uuid()::text, gen_salt('bf'))
 where edit_code_hash is null;
 
 alter table public.guestbook
-  alter column edit_code_hash set not null;
+  alter column edit_code_hash drop not null;
+
+update public.guestbook
+set owner_token_hash = crypt(gen_random_uuid()::text, gen_salt('bf'))
+where owner_token_hash is null;
+
+alter table public.guestbook
+  alter column owner_token_hash set not null;
 
 do $$
 declare
@@ -106,7 +117,7 @@ create or replace function public.create_guestbook_entry(
   p_name text,
   p_attendance text,
   p_message text,
-  p_edit_password text
+  p_owner_token text
 )
 returns bigint
 language plpgsql
@@ -128,12 +139,12 @@ begin
     raise exception 'invalid message';
   end if;
 
-  if char_length(p_edit_password) not between 4 and 30 then
-    raise exception 'invalid password';
+  if char_length(p_owner_token) not between 12 and 200 then
+    raise exception 'invalid owner token';
   end if;
 
-  insert into public.guestbook (name, attendance, message, edit_code_hash)
-  values (p_name, p_attendance, p_message, crypt(p_edit_password, gen_salt('bf')))
+  insert into public.guestbook (name, attendance, message, owner_token_hash)
+  values (p_name, p_attendance, p_message, crypt(p_owner_token, gen_salt('bf')))
   returning id into new_id;
 
   return new_id;
@@ -145,7 +156,7 @@ create or replace function public.update_guestbook_entry(
   p_name text,
   p_attendance text,
   p_message text,
-  p_edit_password text
+  p_owner_token text
 )
 returns boolean
 language plpgsql
@@ -171,7 +182,7 @@ begin
     attendance = p_attendance,
     message = p_message
   where id = p_id
-    and edit_code_hash = crypt(p_edit_password, edit_code_hash);
+    and owner_token_hash = crypt(p_owner_token, owner_token_hash);
 
   return found;
 end;
@@ -179,7 +190,7 @@ $$;
 
 create or replace function public.delete_guestbook_entry(
   p_id bigint,
-  p_edit_password text
+  p_owner_token text
 )
 returns boolean
 language plpgsql
@@ -189,7 +200,7 @@ as $$
 begin
   delete from public.guestbook
   where id = p_id
-    and edit_code_hash = crypt(p_edit_password, edit_code_hash);
+    and owner_token_hash = crypt(p_owner_token, owner_token_hash);
 
   return found;
 end;
