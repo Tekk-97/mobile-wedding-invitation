@@ -14,6 +14,8 @@ drop function if exists public.create_guestbook_entry(text, text, text, text);
 drop function if exists public.update_guestbook_entry(bigint, text, text, text, text);
 drop function if exists public.delete_guestbook_entry(bigint, text);
 drop function if exists public.list_guestbook_entries(text);
+drop function if exists public.admin_update_guestbook_entry(bigint, text, text, text);
+drop function if exists public.admin_delete_guestbook_entry(bigint);
 
 alter table public.guestbook
   add column if not exists edit_code_hash text;
@@ -238,10 +240,85 @@ begin
 end;
 $$;
 
+create or replace function public.is_guestbook_admin()
+returns boolean
+language sql
+security definer
+set search_path = public, extensions, pg_temp
+as $$
+  select exists (
+    select 1
+    from public.admin_users
+    where admin_users.user_id = auth.uid()
+  );
+$$;
+
+create or replace function public.admin_update_guestbook_entry(
+  p_id bigint,
+  p_name text,
+  p_attendance text,
+  p_message text
+)
+returns boolean
+language plpgsql
+security definer
+set search_path = public, extensions, pg_temp
+as $$
+begin
+  if not public.is_guestbook_admin() then
+    return false;
+  end if;
+
+  if char_length(p_name) not between 1 and 20 then
+    return false;
+  end if;
+
+  if p_attendance not in ('참석 예정', '불참', '미정') then
+    return false;
+  end if;
+
+  if char_length(p_message) not between 1 and 300 then
+    return false;
+  end if;
+
+  update public.guestbook
+  set
+    name = p_name,
+    attendance = p_attendance,
+    message = p_message
+  where id = p_id;
+
+  return found;
+end;
+$$;
+
+create or replace function public.admin_delete_guestbook_entry(
+  p_id bigint
+)
+returns boolean
+language plpgsql
+security definer
+set search_path = public, extensions, pg_temp
+as $$
+begin
+  if not public.is_guestbook_admin() then
+    return false;
+  end if;
+
+  delete from public.guestbook
+  where id = p_id;
+
+  return found;
+end;
+$$;
+
 grant execute on function public.create_guestbook_entry(text, text, text, text) to anon, authenticated;
 grant execute on function public.update_guestbook_entry(bigint, text, text, text, text) to anon, authenticated;
 grant execute on function public.delete_guestbook_entry(bigint, text) to anon, authenticated;
 grant execute on function public.list_guestbook_entries(text) to anon, authenticated;
+grant execute on function public.is_guestbook_admin() to authenticated;
+grant execute on function public.admin_update_guestbook_entry(bigint, text, text, text) to authenticated;
+grant execute on function public.admin_delete_guestbook_entry(bigint) to authenticated;
 
 -- 관리자 설정:
 -- 1. Supabase Dashboard > Authentication > Users에서 관리자 이메일/비밀번호 계정을 만듭니다.

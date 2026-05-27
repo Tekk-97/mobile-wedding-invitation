@@ -113,20 +113,23 @@ adminList.addEventListener("click", async (event) => {
   const id = card.dataset.id;
 
   if (button.dataset.action === "delete") {
-    const { error } = await client.from("guestbook").delete().eq("id", id);
-    setStatus(error ? "삭제하지 못했습니다." : "삭제했습니다.");
+    const { data, error } = await client.rpc("admin_delete_guestbook_entry", {
+      p_id: Number(id),
+    });
+    setStatus(error || !data ? "삭제하지 못했습니다. 관리자 권한을 확인해 주세요." : "삭제했습니다.");
     await loadRows();
     return;
   }
 
   const payload = {
-    name: card.querySelector('[data-field="name"]').value.trim(),
-    attendance: card.querySelector('[data-field="attendance"]').value,
-    message: card.querySelector('[data-field="message"]').value.trim(),
+    p_id: Number(id),
+    p_name: card.querySelector('[data-field="name"]').value.trim(),
+    p_attendance: card.querySelector('[data-field="attendance"]').value,
+    p_message: card.querySelector('[data-field="message"]').value.trim(),
   };
 
-  const { error } = await client.from("guestbook").update(payload).eq("id", id);
-  setStatus(error ? "저장하지 못했습니다." : "저장했습니다.");
+  const { data, error } = await client.rpc("admin_update_guestbook_entry", payload);
+  setStatus(error || !data ? "저장하지 못했습니다. 관리자 권한을 확인해 주세요." : "저장했습니다.");
   await loadRows();
 });
 
