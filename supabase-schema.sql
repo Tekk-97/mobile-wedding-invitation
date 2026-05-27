@@ -126,7 +126,7 @@ returns table (
 )
 language sql
 security definer
-set search_path = public, pg_temp
+set search_path = public, extensions, pg_temp
 as $$
   select
     guestbook.id,
@@ -149,7 +149,7 @@ create or replace function public.create_guestbook_entry(
 returns bigint
 language plpgsql
 security definer
-set search_path = public, pg_temp
+set search_path = public, extensions, pg_temp
 as $$
 declare
   new_id bigint;
@@ -188,7 +188,7 @@ create or replace function public.update_guestbook_entry(
 returns boolean
 language plpgsql
 security definer
-set search_path = public, pg_temp
+set search_path = public, extensions, pg_temp
 as $$
 begin
   if char_length(p_name) not between 1 and 20 then
@@ -222,7 +222,7 @@ create or replace function public.delete_guestbook_entry(
 returns boolean
 language plpgsql
 security definer
-set search_path = public, pg_temp
+set search_path = public, extensions, pg_temp
 as $$
 begin
   delete from public.guestbook
