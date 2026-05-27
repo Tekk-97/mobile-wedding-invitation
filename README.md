@@ -1,37 +1,33 @@
 # Mobile Wedding Invitation
 
-GitHub Pages에 바로 배포할 수 있는 모바일 청첩장입니다. Supabase를 연결하면 방명록을 저장하고 최신순으로 보여줍니다.
-
-## 파일 구성
-
-- `index.html`: 청첩장 화면
-- `styles.css`: 모바일 중심 스타일
-- `app.js`: Supabase 방명록 연동
-- `config.js`: Supabase URL과 anon key 설정
-- `supabase-schema.sql`: Supabase 테이블과 RLS 정책
+GitHub Pages에 배포할 수 있는 모바일 청첩장입니다. Supabase를 연결하면 방명록을 저장하고 최신순으로 보여줍니다.
 
 ## Supabase 설정
 
 1. Supabase 프로젝트를 만듭니다.
 2. SQL Editor에서 `supabase-schema.sql` 내용을 실행합니다.
-3. Project Settings > API에서 Project URL과 anon public key를 복사합니다.
-4. `config.js`에 값을 입력합니다.
+3. Project Settings > API에서 Project URL과 anon public key를 확인합니다.
 
-```js
-window.WEDDING_CONFIG = {
-  supabaseUrl: "https://xxxx.supabase.co",
-  supabaseAnonKey: "eyJ...",
-};
-```
+## GitHub Secrets
 
-anon key는 프론트엔드에 들어가는 공개 키입니다. 대신 `supabase-schema.sql`의 RLS 정책을 꼭 켜 둬야 합니다.
+이 저장소는 `config.js`를 커밋하지 않습니다. GitHub Actions가 배포할 때 Secrets 값으로 `config.js`를 생성합니다.
 
-## GitHub Pages 배포
+저장소에서 아래 위치로 이동하세요.
 
-1. GitHub에 public 저장소를 만듭니다.
-2. 이 폴더를 push합니다.
-3. 저장소 Settings > Pages에서 `Deploy from a branch`를 선택합니다.
-4. Branch는 `main`, folder는 `/root`로 설정합니다.
+`Settings > Secrets and variables > Actions > New repository secret`
+
+추가할 Secrets:
+
+- `SUPABASE_URL`: Supabase Project URL
+- `SUPABASE_ANON_KEY`: Supabase anon public key
+
+값을 넣은 뒤 `Actions > Deploy GitHub Pages > Run workflow`를 실행하거나, 아무 파일이나 수정해서 `main`에 push하면 다시 배포됩니다.
+
+주의: Supabase anon key는 브라우저에서 동작하는 공개 키입니다. public repo에는 남기지 않도록 했지만, 배포된 웹사이트의 JavaScript에서는 볼 수 있습니다. 보안은 `supabase-schema.sql`의 RLS 정책으로 보호합니다. `service_role` key는 절대 넣으면 안 됩니다.
+
+## 로컬 확인
+
+로컬에서 실제 Supabase 연결을 테스트하려면 `config.example.js`를 `config.js`로 복사한 뒤 값을 채워 넣으세요. `config.js`는 `.gitignore`에 들어 있어 커밋되지 않습니다.
 
 ## 수정할 곳
 
