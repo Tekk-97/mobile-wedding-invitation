@@ -214,31 +214,37 @@ const renderMessages = (messages) => {
             <span>${escapeHtml(item.attendance)} · ${formatDate(item.created_at)}</span>
           </div>
           <p>${escapeHtml(item.message)}</p>
-          <div class="message__actions">
-            <button type="button" data-edit-open="${item.id}">수정/삭제</button>
-          </div>
-          <form class="message-editor" data-editor="${item.id}" hidden>
-            <label>
-              이름
-              <input data-edit-field="name" maxlength="20" value="${escapeHtml(item.name)}" required />
-            </label>
-            <label>
-              참석 여부
-              <select data-edit-field="attendance">
-                <option value="참석 예정" ${item.attendance === "참석 예정" ? "selected" : ""}>참석 예정</option>
-                <option value="불참" ${item.attendance === "불참" ? "selected" : ""}>불참</option>
-                <option value="미정" ${item.attendance === "미정" ? "selected" : ""}>미정</option>
-              </select>
-            </label>
-            <label>
-              메시지
-              <textarea data-edit-field="message" maxlength="300" rows="3" required>${escapeHtml(item.message)}</textarea>
-            </label>
-            <div class="message-editor__actions">
-              <button type="submit">저장</button>
-              <button type="button" data-delete-entry="${item.id}" class="danger-button">삭제</button>
-            </div>
-          </form>
+          ${
+            item.can_edit
+              ? `
+                <div class="message__actions">
+                  <button type="button" data-edit-open="${item.id}">수정/삭제</button>
+                </div>
+                <form class="message-editor" data-editor="${item.id}" hidden>
+                  <label>
+                    이름
+                    <input data-edit-field="name" maxlength="20" value="${escapeHtml(item.name)}" required />
+                  </label>
+                  <label>
+                    참석 여부
+                    <select data-field="attendance" data-edit-field="attendance">
+                      <option value="참석 예정" ${item.attendance === "참석 예정" ? "selected" : ""}>참석 예정</option>
+                      <option value="불참" ${item.attendance === "불참" ? "selected" : ""}>불참</option>
+                      <option value="미정" ${item.attendance === "미정" ? "selected" : ""}>미정</option>
+                    </select>
+                  </label>
+                  <label>
+                    메시지
+                    <textarea data-edit-field="message" maxlength="300" rows="3" required>${escapeHtml(item.message)}</textarea>
+                  </label>
+                  <div class="message-editor__actions">
+                    <button type="submit">저장</button>
+                    <button type="button" data-delete-entry="${item.id}" class="danger-button">삭제</button>
+                  </div>
+                </form>
+              `
+              : ""
+          }
         </article>
       `,
     )
@@ -259,14 +265,12 @@ const loadMessages = async () => {
     return;
   }
 
-  const { data, error } = await client
-    .from("guestbook")
-    .select("id, name, attendance, message, created_at")
-    .order("created_at", { ascending: false })
-    .limit(50);
+  const { data, error } = await client.rpc("list_guestbook_entries", {
+    p_owner_token: getDeviceToken(),
+  });
 
   if (error) {
-    setStatus("방명록을 불러오지 못했습니다. Supabase 정책을 확인해 주세요.");
+    setStatus("방명록을 불러오지 못했습니다. Supabase SQL을 다시 실행해 주세요.");
     return;
   }
 
@@ -297,7 +301,7 @@ form.addEventListener("submit", async (event) => {
   button.disabled = false;
 
   if (error) {
-    setStatus("저장하지 못했습니다. 잠시 후 다시 시도해 주세요.");
+    setStatus("저장하지 못했습니다. Supabase SQL을 다시 실행한 뒤 새로고침해 주세요.");
     return;
   }
 

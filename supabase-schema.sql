@@ -113,6 +113,33 @@ using (user_id = auth.uid());
 create index if not exists guestbook_created_at_idx
 on public.guestbook (created_at desc);
 
+create or replace function public.list_guestbook_entries(
+  p_owner_token text
+)
+returns table (
+  id bigint,
+  name text,
+  attendance text,
+  message text,
+  created_at timestamptz,
+  can_edit boolean
+)
+language sql
+security definer
+set search_path = public, pg_temp
+as $$
+  select
+    guestbook.id,
+    guestbook.name,
+    guestbook.attendance,
+    guestbook.message,
+    guestbook.created_at,
+    guestbook.owner_token_hash = crypt(p_owner_token, guestbook.owner_token_hash) as can_edit
+  from public.guestbook
+  order by guestbook.created_at desc
+  limit 50;
+$$;
+
 create or replace function public.create_guestbook_entry(
   p_name text,
   p_attendance text,
@@ -209,6 +236,7 @@ $$;
 grant execute on function public.create_guestbook_entry(text, text, text, text) to anon, authenticated;
 grant execute on function public.update_guestbook_entry(bigint, text, text, text, text) to anon, authenticated;
 grant execute on function public.delete_guestbook_entry(bigint, text) to anon, authenticated;
+grant execute on function public.list_guestbook_entries(text) to anon, authenticated;
 
 -- 관리자 설정:
 -- 1. Supabase Dashboard > Authentication > Users에서 관리자 이메일/비밀번호 계정을 만듭니다.

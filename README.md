@@ -84,6 +84,7 @@ albumImages: [
 - [ ] 앨범 사진 URL 변경: `site-data.js`의 `albumImages`
 - [ ] 계좌번호, 은행, 예금주 변경: `site-data.js`의 `accounts`
 - [ ] Supabase SQL 실행: `supabase-schema.sql`
+- [ ] SQL 실행 후 사이트를 새로고침해서 방명록 저장 테스트
 - [ ] GitHub Secrets 등록: `SUPABASE_URL`, `SUPABASE_ANON_KEY`
 - [ ] 관리자 계정 생성 후 `admin_users`에 UID 등록
 - [ ] 메인 페이지에서 방명록 작성 테스트
