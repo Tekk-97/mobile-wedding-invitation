@@ -30,7 +30,10 @@ const welcomeMessage = document.querySelector("#welcome-message");
 const shareStatus = document.querySelector("#share-status");
 const shareNativeButton = document.querySelector("#share-native");
 const copyLinkButton = document.querySelector("#copy-link");
+const siteShell = document.querySelector(".site-shell");
 let currentAlbumIndex = 0;
+
+const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
 
 const getDeviceToken = () => {
   const key = "wedding_guestbook_device_token";
@@ -195,6 +198,58 @@ const revealSections = () => {
   );
 
   sections.forEach((section) => observer.observe(section));
+};
+
+const renderPetals = () => {
+  const petalConfig = siteData.petals || {};
+  if (petalConfig.enabled === false || !siteShell) return;
+
+  const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const createPetal = (className = "petal") => {
+    const petal = document.createElement("span");
+    const size = 9 + Math.random() * 8;
+    const fall = 11 + Math.random() * 9;
+    const sway = 3.6 + Math.random() * 2.8;
+    const drift = (Math.random() > 0.5 ? 1 : -1) * (18 + Math.random() * 38);
+
+    petal.className = className;
+    petal.style.setProperty("--petal-left", `${Math.random() * 100}%`);
+    petal.style.setProperty("--petal-size", `${size}px`);
+    petal.style.setProperty("--petal-fall", `${fall}s`);
+    petal.style.setProperty("--petal-sway", `${sway}s`);
+    petal.style.setProperty("--petal-delay", `${Math.random() * -fall}s`);
+    petal.style.setProperty("--petal-sway-delay", `${Math.random() * -sway}s`);
+    petal.style.setProperty("--petal-opacity", `${0.16 + Math.random() * 0.16}`);
+    petal.style.setProperty("--petal-spin", `${Math.random() * 360}deg`);
+    petal.style.setProperty("--petal-drift", `${drift}px`);
+    return petal;
+  };
+
+  const createPetalLayer = (target, className, count) => {
+    if (!target) return;
+
+    const layer = document.createElement("div");
+    layer.className = `petal-layer ${className}`;
+    layer.setAttribute("aria-hidden", "true");
+
+    for (let index = 0; index < count; index += 1) {
+      layer.append(createPetal());
+    }
+
+    target.prepend(layer);
+  };
+
+  createPetalLayer(
+    document.querySelector(".hero"),
+    "petal-layer--hero",
+    clamp(Number(petalConfig.heroCount) || 8, 0, 16),
+  );
+
+  if (!prefersReducedMotion) {
+    const sectionCount = clamp(Number(petalConfig.sectionCount) || 3, 0, 10);
+    createPetalLayer(document.querySelector(".intro"), "petal-layer--section", sectionCount);
+    createPetalLayer(document.querySelector(".info-band"), "petal-layer--section", sectionCount);
+  }
 };
 
 const copyText = async (text) => {
@@ -507,5 +562,6 @@ renderDday();
 renderAlbum();
 renderAccounts();
 renderMapFrame();
+renderPetals();
 revealSections();
 loadMessages();
