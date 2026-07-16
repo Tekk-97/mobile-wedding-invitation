@@ -24,16 +24,48 @@ const albumViewerCaption = document.querySelector("#album-viewer-caption");
 const albumCloseButton = document.querySelector(".album-viewer__close");
 const albumPrevButton = document.querySelector(".album-viewer__nav--prev");
 const albumNextButton = document.querySelector(".album-viewer__nav--next");
-const mapFrameLink = document.querySelector("#map-frame-link");
 const ddayLabel = document.querySelector("#dday-label");
 const welcomeMessage = document.querySelector("#welcome-message");
 const shareStatus = document.querySelector("#share-status");
 const shareNativeButton = document.querySelector("#share-native");
 const copyLinkButton = document.querySelector("#copy-link");
 const siteShell = document.querySelector(".site-shell");
+const music = document.querySelector("#wedding-music");
+const musicToggle = document.querySelector("#music-toggle");
 let currentAlbumIndex = 0;
 
 const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+
+const setMusicState = (playing) => {
+  musicToggle.classList.toggle("is-paused", !playing);
+  musicToggle.setAttribute("aria-pressed", String(playing));
+  musicToggle.setAttribute("aria-label", playing ? "배경 음악 끄기" : "배경 음악 재생하기");
+};
+
+const tryPlayMusic = async () => {
+  try {
+    music.volume = 0.42;
+    await music.play();
+    setMusicState(true);
+    return true;
+  } catch {
+    setMusicState(false);
+    return false;
+  }
+};
+
+musicToggle.addEventListener("pointerdown", (event) => event.stopPropagation());
+musicToggle.addEventListener("click", async () => {
+  if (music.paused) await tryPlayMusic();
+  else { music.pause(); setMusicState(false); }
+});
+
+tryPlayMusic().then((started) => {
+  if (started) return;
+  const startOnFirstGesture = () => { tryPlayMusic(); };
+  document.addEventListener("pointerdown", startOnFirstGesture, { once: true });
+  document.addEventListener("keydown", startOnFirstGesture, { once: true });
+});
 
 const getDeviceToken = () => {
   const key = "wedding_guestbook_device_token";
@@ -118,6 +150,12 @@ const renderAlbum = () => {
       `;
     })
     .join("");
+
+  albumGrid.querySelectorAll("[data-album-index]").forEach((button) => {
+    button.addEventListener("click", () => {
+      showAlbumImage(Number(button.dataset.albumIndex));
+    });
+  });
 };
 
 const getAlbumItem = (index) => {
@@ -149,12 +187,6 @@ const closeAlbum = () => {
   document.body.classList.remove("is-viewing-album");
 };
 
-albumGrid.addEventListener("click", (event) => {
-  const button = event.target.closest("[data-album-index]");
-  if (!button) return;
-  showAlbumImage(Number(button.dataset.albumIndex));
-});
-
 albumCloseButton.addEventListener("click", closeAlbum);
 albumPrevButton.addEventListener("click", () => showAlbumImage(currentAlbumIndex - 1));
 albumNextButton.addEventListener("click", () => showAlbumImage(currentAlbumIndex + 1));
@@ -167,16 +199,6 @@ document.addEventListener("keydown", (event) => {
   if (event.key === "ArrowLeft") showAlbumImage(currentAlbumIndex - 1);
   if (event.key === "ArrowRight") showAlbumImage(currentAlbumIndex + 1);
 });
-
-const renderMapFrame = () => {
-  const venue = siteData.venue || {};
-  const url = venue.embedUrl || venue.naverMapUrl;
-  if (!url) return;
-
-  mapFrameLink.href = venue.naverMapUrl || url;
-  mapFrameLink.querySelector("iframe").src = url;
-  mapFrameLink.querySelector("iframe").title = `${venue.name || "예식장"} 지도`;
-};
 
 const revealSections = () => {
   const sections = document.querySelectorAll(".section");
@@ -282,11 +304,6 @@ const renderAccounts = () => {
             <p>${escapeHtml(account.holder)} · ${escapeHtml(account.name)}</p>
           </div>
           <button type="button" data-copy-account="${index}">복사</button>
-          <div class="account-card__pay">
-            <button type="button" data-pay-account="${index}" data-pay-type="kakaoPayUrl" aria-label="카카오페이 송금">
-              <span class="kakao-pay-mark"><b>kakao</b><strong>pay</strong><em>송금</em></span>
-            </button>
-          </div>
         </article>
       `,
     )
@@ -312,52 +329,6 @@ accountList.addEventListener("click", async (event) => {
       button.textContent = "복사";
     }, 1400);
   }
-});
-
-accountList.addEventListener("click", async (event) => {
-  const button = event.target.closest("[data-pay-account]");
-  if (!button) return;
-
-  const account = siteData.accounts[Number(button.dataset.payAccount)];
-  const url = account[button.dataset.payType];
-  const copyValue = `${account.bank} ${account.number} ${account.holder}`;
-
-  if (url) {
-    window.location.href = url;
-    return;
-  }
-
-  await copyText(copyValue);
-  button.textContent = "계좌 복사됨";
-  setTimeout(() => {
-    button.innerHTML = '<span class="kakao-pay-mark"><b>kakao</b><strong>pay</strong><em>송금</em></span>';
-  }, 1400);
-});
-
-document.addEventListener("click", (event) => {
-  const button = event.target.closest("[data-navi]");
-  if (!button) return;
-
-  const venue = siteData.venue || {};
-  const lat = venue.latitude;
-  const lng = venue.longitude;
-  const name = encodeURIComponent(venue.name || "예식장");
-  const fallback = venue.kakaoMapUrl || venue.naverMapUrl || getShareUrl();
-
-  if (!lat || !lng) {
-    window.location.href = fallback;
-    return;
-  }
-
-  const appUrl =
-    button.dataset.navi === "kakao"
-      ? `kakaonavi://navigate?name=${name}&x=${lng}&y=${lat}&coord_type=wgs84`
-      : `tmap://route?goalname=${name}&goalx=${lng}&goaly=${lat}`;
-
-  window.location.href = appUrl;
-  setTimeout(() => {
-    window.location.href = fallback;
-  }, 900);
 });
 
 const renderMessages = (messages) => {
@@ -561,7 +532,6 @@ copyLinkButton.addEventListener("click", async () => {
 renderDday();
 renderAlbum();
 renderAccounts();
-renderMapFrame();
 renderPetals();
 revealSections();
 loadMessages();

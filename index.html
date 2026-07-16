@@ -8,14 +8,14 @@
     <meta property="og:type" content="website" />
     <meta property="og:title" content="배형범 · 박수빈 결혼합니다" />
     <meta property="og:description" content="2026년 10월 25일 일요일 오전 11시, 엔팰리스웨딩컨벤션" />
-    <meta property="og:image" content="https://images.unsplash.com/photo-1520854221256-17451cc331bf?auto=format&fit=crop&w=1200&q=82" />
+    <meta property="og:image" content="https://tekk-97.github.io/mobile-wedding-invitation/Image/optimized/pink-flower-window-couple.webp" />
     <meta property="og:url" content="https://tekk-97.github.io/mobile-wedding-invitation/" />
     <meta name="twitter:card" content="summary_large_image" />
     <title>우리 결혼합니다</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Noto+Sans+KR:wght@400;500;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Nanum+Pen+Script&family=Noto+Sans+KR:wght@400;500;700&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="./styles.css" />
@@ -29,18 +29,25 @@
       <section class="hero" aria-label="청첩장 첫 화면">
         <img
           class="hero__image"
-          src="https://images.unsplash.com/photo-1520854221256-17451cc331bf?auto=format&fit=crop&w=1200&q=82"
-          alt="따뜻한 빛이 들어오는 결혼식장"
+          src="./Image/optimized/pink-flower-window-couple.webp"
+          alt="꽃으로 둘러싸인 신랑 신부"
           fetchpriority="high"
         />
         <div class="hero__shade"></div>
-        <div class="hero__content">
-          <p class="kicker">Wedding Invitation</p>
-          <h1>배형범 · 박수빈</h1>
-          <p class="hero__date">2026. 10. 25 SUN 11:00 AM</p>
-          <p class="hero__place">엔팰리스웨딩컨벤션</p>
+        <div class="hero__content" aria-label="Our Wedding Day">
+          <svg class="hero__script" viewBox="0 0 500 150" role="img" aria-hidden="true">
+            <text x="250" y="94" text-anchor="middle">
+              <tspan>O</tspan><tspan>u</tspan><tspan>r</tspan><tspan>&#160;</tspan><tspan>W</tspan><tspan>e</tspan><tspan>d</tspan><tspan>d</tspan><tspan>i</tspan><tspan>n</tspan><tspan>g</tspan><tspan>&#160;</tspan><tspan>D</tspan><tspan>a</tspan><tspan>y</tspan>
+            </text>
+          </svg>
         </div>
       </section>
+
+      <button id="music-toggle" class="music-toggle" type="button" aria-label="배경 음악 끄기" aria-pressed="true">
+        <span class="music-toggle__bars" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="music-toggle__label">BGM</span>
+      </button>
+      <audio id="wedding-music" src="./Audio/wedding-bgm.mp3" preload="auto" loop></audio>
 
       <section class="intro section">
         <p class="eyebrow">초대합니다</p>
@@ -72,18 +79,17 @@
 
       <section class="section people">
         <p class="eyebrow">신랑 · 신부</p>
+        <p class="people__intro">두 사람이 한마음으로<br />새로운 시작을 함께합니다.</p>
         <div class="people__grid">
           <article>
-            <span>Groom</span>
-            <h3>배형범</h3>
-            <p>배학연 · 김미영의 둘째</p>
-            <a href="tel:010-0000-0000">연락하기</a>
+            <p><span>배학연 · 김미영</span>의 둘째</p>
+            <h3>배형범 <small>신랑</small></h3>
+            <a href="tel:010-0000-0000" aria-label="신랑에게 전화하기">전화하기</a>
           </article>
           <article>
-            <span>Bride</span>
-            <h3>박수빈</h3>
-            <p>박영운 · 정지윤의 딸</p>
-            <a href="tel:010-1111-1111">연락하기</a>
+            <p><span>박영운 · 정지윤</span>의 딸</p>
+            <h3>박수빈 <small>신부</small></h3>
+            <a href="tel:010-1111-1111" aria-label="신부에게 전화하기">전화하기</a>
           </article>
         </div>
       </section>
@@ -105,37 +111,60 @@
         </div>
       </section>
 
+      <section class="section story">
+        <p class="eyebrow">Our Story</p>
+        <h2>우리의 시간</h2>
+        <p class="story__lead">처음 마주한 순간부터 오늘의 약속까지</p>
+        <div class="story__timeline">
+          <article class="story__item story__item--left">
+            <div class="story__photo"><img src="./Image/optimized/pink-table-close-couple.webp" alt="분홍 꽃 테이블에 함께 앉은 두 사람" loading="lazy" /></div>
+            <div class="story__copy"><span>우리의 시작</span><strong>첫 만남</strong><p>서로의 하루가 궁금해지기 시작한 날</p></div>
+          </article>
+          <article class="story__item story__item--right">
+            <div class="story__photo"><img src="./Image/optimized/green-garden-couple-portrait.webp" alt="초록 정원 속 신랑 신부" loading="lazy" /></div>
+            <div class="story__copy"><span>함께한 시간</span><strong>서로의 계절</strong><p>평범한 날들을 특별한 추억으로 채웠습니다</p></div>
+          </article>
+          <article class="story__item story__item--left">
+            <div class="story__photo"><img src="./Image/optimized/yellow-bouquet-wall-couple.webp" alt="노란 부케를 들고 나란히 선 신랑 신부" loading="lazy" /></div>
+            <div class="story__copy"><span>2026. 10. 25</span><strong>그리고, 영원히</strong><p>이제 같은 곳을 바라보며 걸어가려 합니다</p></div>
+          </article>
+        </div>
+      </section>
+
       <section class="section album">
         <p class="eyebrow">Album</p>
         <h2>우리의 순간들</h2>
         <div id="album-grid" class="album__grid"></div>
-        <div id="album-viewer" class="album-viewer" hidden>
-          <button class="album-viewer__close" type="button" aria-label="닫기">×</button>
-          <button class="album-viewer__nav album-viewer__nav--prev" type="button" aria-label="이전 사진">‹</button>
-          <img id="album-viewer-image" src="" alt="" />
-          <button class="album-viewer__nav album-viewer__nav--next" type="button" aria-label="다음 사진">›</button>
-          <p id="album-viewer-caption"></p>
-        </div>
       </section>
 
       <section class="section location">
         <p class="eyebrow">오시는 길</p>
         <h2>엔팰리스웨딩컨벤션</h2>
         <p>경기 평택시 경기대로 721</p>
-        <a id="map-frame-link" class="map-frame" href="https://map.naver.com/p/search/엔팰리스웨딩컨벤션" target="_blank" rel="noreferrer" aria-label="네이버 지도에서 위치 보기">
-          <iframe
-            title="엔팰리스웨딩컨벤션 지도"
-            src="https://map.naver.com/p/search/엔팰리스웨딩컨벤션"
-            loading="lazy"
-            referrerpolicy="no-referrer-when-downgrade"
-          ></iframe>
-          <span class="map-frame__caption">지도가 열리지 않으면 탭해서 네이버 지도에서 확인하세요.</span>
-        </a>
+        <div class="route-map" role="img" aria-label="평택지제역에서 경기대로를 따라 엔팰리스웨딩컨벤션으로 오는 약도">
+          <svg viewBox="0 0 440 260" aria-hidden="true">
+            <rect width="440" height="260" fill="#f5f1ea" />
+            <path class="route-map__minor" d="M0 62H440M0 205H440M88 0V260M352 0V260" />
+            <path class="route-map__road" d="M220 -10C208 55 234 95 220 145S213 220 228 275" />
+            <path class="route-map__rail" d="M65 -10V270" />
+            <g class="route-map__station">
+              <rect x="24" y="96" width="82" height="42" rx="8" />
+              <text x="65" y="114">SRT · 1호선</text>
+              <text x="65" y="130">평택지제역</text>
+            </g>
+            <path class="route-map__guide" d="M108 117C145 117 166 139 204 139" />
+            <g class="route-map__pin" transform="translate(220 139)">
+              <path d="M0-31c-17 0-29 12-29 28 0 22 29 48 29 48S29 19 29-3C29-19 17-31 0-31Z" />
+              <circle cy="-4" r="9" />
+            </g>
+            <text class="route-map__venue" x="252" y="132">엔팰리스</text>
+            <text class="route-map__address" x="252" y="151">경기대로 721</text>
+            <text class="route-map__road-label" transform="translate(240 54) rotate(83)">경기대로</text>
+          </svg>
+        </div>
         <div class="map-actions">
-          <a class="app-icon app-icon--kakao" href="https://map.kakao.com/link/search/엔팰리스웨딩컨벤션" target="_blank" rel="noreferrer" aria-label="카카오맵 열기" title="카카오맵"></a>
-          <a class="app-icon app-icon--naver" href="https://map.naver.com/p/search/엔팰리스웨딩컨벤션" target="_blank" rel="noreferrer" aria-label="네이버지도 열기" title="네이버지도"></a>
-          <button class="app-icon app-icon--kakaonavi" type="button" data-navi="kakao" aria-label="카카오내비 열기" title="카카오내비"></button>
-          <button class="app-icon app-icon--tmap" type="button" data-navi="tmap" aria-label="티맵 열기" title="티맵"></button>
+          <a class="map-app-button map-app-button--naver" href="https://map.naver.com/p/search/엔팰리스웨딩컨벤션" target="_blank" rel="noreferrer" aria-label="네이버지도에서 엔팰리스웨딩컨벤션 열기"><span class="naver-map-logo">N</span><strong>네이버지도</strong></a>
+          <a class="map-app-button map-app-button--kakao" href="https://map.kakao.com/link/search/엔팰리스웨딩컨벤션" target="_blank" rel="noreferrer" aria-label="카카오맵에서 엔팰리스웨딩컨벤션 열기"><span class="kakao-map-logo"><i></i></span><strong>카카오맵</strong></a>
         </div>
       </section>
 
@@ -194,5 +223,12 @@
         <div id="guestbook-list" class="guestbook__list" aria-live="polite"></div>
       </section>
     </main>
+    <div id="album-viewer" class="album-viewer" hidden>
+      <button class="album-viewer__close" type="button" aria-label="닫기">×</button>
+      <button class="album-viewer__nav album-viewer__nav--prev" type="button" aria-label="이전 사진">‹</button>
+      <img id="album-viewer-image" src="" alt="" />
+      <button class="album-viewer__nav album-viewer__nav--next" type="button" aria-label="다음 사진">›</button>
+      <p id="album-viewer-caption"></p>
+    </div>
   </body>
 </html>
