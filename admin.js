@@ -12,6 +12,8 @@ const client = isConfigured
 const loginForm = document.querySelector("#login-form");
 const adminPanel = document.querySelector("#admin-panel");
 const adminList = document.querySelector("#admin-list");
+const adminRsvpList = document.querySelector("#admin-rsvp-list");
+const adminRsvpCount = document.querySelector("#admin-rsvp-count");
 const statusEl = document.querySelector("#admin-status");
 const logoutButton = document.querySelector("#logout-button");
 
@@ -25,6 +27,42 @@ const escapeHtml = (value) =>
 
 const setStatus = (message) => {
   statusEl.textContent = message;
+};
+
+const formatDate = (value) =>
+  new Intl.DateTimeFormat("ko-KR", {
+    month: "long",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(new Date(value));
+
+const renderRsvpRows = (rows) => {
+  adminRsvpCount.textContent = `총 ${rows.length}건`;
+
+  if (!rows.length) {
+    adminRsvpList.innerHTML = '<article class="message"><p>아직 전달된 참석 의사가 없습니다.</p></article>';
+    return;
+  }
+
+  adminRsvpList.innerHTML = rows
+    .map(
+      (row) => `
+        <article class="admin-card admin-rsvp-card" data-rsvp-id="${row.id}">
+          <div class="admin-rsvp-card__head">
+            <strong>${escapeHtml(row.name)}</strong>
+            <span>${escapeHtml(row.side)}측 · ${escapeHtml(row.attendance)}</span>
+          </div>
+          <p>연락처 뒤 4자리 <strong>${escapeHtml(row.phone_last4)}</strong> · ${row.party_size >= 5 ? "5명 이상" : `${row.party_size}명`}</p>
+          ${row.note ? `<p class="admin-rsvp-card__note">${escapeHtml(row.note)}</p>` : ""}
+          <div class="admin-rsvp-card__foot">
+            <time>${formatDate(row.created_at)}</time>
+            <button type="button" data-action="delete-rsvp" class="danger-button">삭제</button>
+          </div>
+        </article>
+      `,
+    )
+    .join("");
 };
 
 const renderRows = (rows) => {
@@ -64,18 +102,26 @@ const renderRows = (rows) => {
 };
 
 const loadRows = async () => {
-  const { data, error } = await client
-    .from("guestbook")
-    .select("id, name, attendance, message, created_at")
-    .order("created_at", { ascending: false })
-    .limit(100);
+  const [guestbookResult, rsvpResult] = await Promise.all([
+    client
+      .from("guestbook")
+      .select("id, name, attendance, message, created_at")
+      .order("created_at", { ascending: false })
+      .limit(100),
+    client
+      .from("rsvp_responses")
+      .select("id, side, attendance, name, phone_last4, party_size, note, created_at")
+      .order("created_at", { ascending: false })
+      .limit(200),
+  ]);
 
-  if (error) {
-    setStatus("관리자 권한이 없거나 방명록을 불러오지 못했습니다.");
+  if (guestbookResult.error || rsvpResult.error) {
+    setStatus("관리자 권한이 없거나 응답 정보를 불러오지 못했습니다.");
     return;
   }
 
-  renderRows(data || []);
+  renderRsvpRows(rsvpResult.data || []);
+  renderRows(guestbookResult.data || []);
   setStatus("");
 };
 
@@ -130,6 +176,19 @@ adminList.addEventListener("click", async (event) => {
 
   const { data, error } = await client.rpc("admin_update_guestbook_entry", payload);
   setStatus(error || !data ? "저장하지 못했습니다. 관리자 권한을 확인해 주세요." : "저장했습니다.");
+  await loadRows();
+});
+
+adminRsvpList.addEventListener("click", async (event) => {
+  const button = event.target.closest('[data-action="delete-rsvp"]');
+  if (!button) return;
+
+  const card = button.closest("[data-rsvp-id]");
+  const { data, error } = await client.rpc("admin_delete_rsvp_response", {
+    p_id: Number(card.dataset.rsvpId),
+  });
+
+  setStatus(error || !data ? "참석 응답을 삭제하지 못했습니다." : "참석 응답을 삭제했습니다.");
   await loadRows();
 });
 

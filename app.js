@@ -17,10 +17,10 @@ const nameInput = document.querySelector("#guest-name");
 const attendanceInput = document.querySelector("#guest-attendance");
 const messageInput = document.querySelector("#guest-message");
 const albumGrid = document.querySelector("#album-grid");
+const albumMoreButton = document.querySelector("#album-more");
 const accountList = document.querySelector("#account-list");
 const albumViewer = document.querySelector("#album-viewer");
 const albumViewerImage = document.querySelector("#album-viewer-image");
-const albumViewerCaption = document.querySelector("#album-viewer-caption");
 const albumCloseButton = document.querySelector(".album-viewer__close");
 const albumPrevButton = document.querySelector(".album-viewer__nav--prev");
 const albumNextButton = document.querySelector(".album-viewer__nav--next");
@@ -32,9 +32,76 @@ const copyLinkButton = document.querySelector("#copy-link");
 const siteShell = document.querySelector(".site-shell");
 const music = document.querySelector("#wedding-music");
 const musicToggle = document.querySelector("#music-toggle");
+const rsvpOpenButton = document.querySelector("#rsvp-open");
+const rsvpModal = document.querySelector("#rsvp-modal");
+const rsvpCloseButton = document.querySelector("#rsvp-close");
+const rsvpForm = document.querySelector("#rsvp-form");
+const rsvpStatus = document.querySelector("#rsvp-status");
+const venueMapFrame = document.querySelector("#venue-map-frame");
+const venueMapHost = document.querySelector("#venue-map");
 let currentAlbumIndex = 0;
 
 const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+
+const initVenueMap = () => {
+  if (!venueMapFrame || !venueMapHost) return;
+
+  const clientId = String(config.naverMapClientId || "").trim();
+  if (!clientId || clientId.includes("YOUR_")) return;
+
+  const renderMap = () => {
+    if (!window.naver?.maps?.Service) return;
+
+    const address = siteData.venue?.address || "경기 평택시 경기대로 721";
+    window.naver.maps.Service.geocode({ query: address }, (status, response) => {
+      const result = response?.v2?.addresses?.[0];
+      if (status !== window.naver.maps.Service.Status.OK || !result) return;
+
+      const position = new window.naver.maps.LatLng(Number(result.y), Number(result.x));
+      const map = new window.naver.maps.Map(venueMapHost, {
+        center: position,
+        zoom: 16,
+        minZoom: 12,
+        maxZoom: 19,
+        scrollWheel: false,
+        zoomControl: true,
+        zoomControlOptions: {
+          position: window.naver.maps.Position.RIGHT_CENTER,
+        },
+      });
+
+      const marker = new window.naver.maps.Marker({ map, position });
+      const infoWindow = new window.naver.maps.InfoWindow({
+        content: '<div class="venue-map-label"><strong>엔팰리스웨딩컨벤션</strong><span>블리스홀 · 오전 11시</span></div>',
+        borderWidth: 0,
+        backgroundColor: "transparent",
+        anchorSize: new window.naver.maps.Size(0, 0),
+        pixelOffset: new window.naver.maps.Point(0, -12),
+      });
+      infoWindow.open(map, marker);
+      venueMapFrame.classList.add("is-map-ready");
+
+      if ("ResizeObserver" in window) {
+        new ResizeObserver(() => {
+          window.naver.maps.Event.trigger(map, "resize");
+          map.setCenter(position);
+        }).observe(venueMapHost);
+      }
+    });
+  };
+
+  if (window.naver?.maps?.Service) {
+    renderMap();
+    return;
+  }
+
+  const script = document.createElement("script");
+  script.src = `https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=${encodeURIComponent(clientId)}&submodules=geocoder`;
+  script.addEventListener("load", renderMap, { once: true });
+  document.head.appendChild(script);
+};
+
+initVenueMap();
 
 const setMusicState = (playing) => {
   musicToggle.classList.toggle("is-paused", !playing);
@@ -44,7 +111,7 @@ const setMusicState = (playing) => {
 
 const tryPlayMusic = async () => {
   try {
-    music.volume = 0.42;
+    music.volume = 0.24;
     await music.play();
     setMusicState(true);
     return true;
@@ -65,6 +132,64 @@ tryPlayMusic().then((started) => {
   const startOnFirstGesture = () => { tryPlayMusic(); };
   document.addEventListener("pointerdown", startOnFirstGesture, { once: true });
   document.addEventListener("keydown", startOnFirstGesture, { once: true });
+});
+
+const openRsvpModal = () => {
+  rsvpModal.hidden = false;
+  document.body.classList.add("is-viewing-rsvp");
+  rsvpStatus.textContent = "";
+  requestAnimationFrame(() => rsvpModal.querySelector("input")?.focus());
+};
+
+const closeRsvpModal = () => {
+  rsvpModal.hidden = true;
+  document.body.classList.remove("is-viewing-rsvp");
+  rsvpOpenButton.focus();
+};
+
+rsvpOpenButton.addEventListener("click", openRsvpModal);
+rsvpCloseButton.addEventListener("click", closeRsvpModal);
+rsvpModal.addEventListener("click", (event) => {
+  if (event.target === rsvpModal) closeRsvpModal();
+});
+
+rsvpForm.elements.phone_last4.addEventListener("input", (event) => {
+  event.target.value = event.target.value.replace(/\D/g, "").slice(0, 4);
+});
+
+rsvpForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+
+  if (!client) {
+    rsvpStatus.textContent = "Supabase 설정 후 참석 정보를 저장할 수 있습니다.";
+    return;
+  }
+
+  const submitButton = rsvpForm.querySelector('[type="submit"]');
+  const formData = new FormData(rsvpForm);
+  submitButton.disabled = true;
+  rsvpStatus.textContent = "참석 의사를 저장하고 있습니다...";
+
+  const { error } = await client.rpc("submit_rsvp_response", {
+    p_side: formData.get("side"),
+    p_attendance: formData.get("attendance"),
+    p_name: String(formData.get("name") || "").trim(),
+    p_phone_last4: String(formData.get("phone_last4") || "").trim(),
+    p_party_size: Number(formData.get("party_size")),
+    p_note: String(formData.get("note") || "").trim(),
+  });
+
+  submitButton.disabled = false;
+
+  if (error) {
+    rsvpStatus.textContent = "저장하지 못했습니다. 잠시 후 다시 시도해 주세요.";
+    return;
+  }
+
+  rsvpForm.reset();
+  rsvpStatus.textContent = "참석 의사가 소중히 전달되었습니다.";
+  rsvpOpenButton.textContent = "참석 의사 전달 완료";
+  setTimeout(closeRsvpModal, 1200);
 });
 
 const getDeviceToken = () => {
@@ -129,6 +254,11 @@ const renderDday = () => {
 const renderAlbum = () => {
   const images = Array.isArray(siteData.albumImages) ? siteData.albumImages : [];
 
+  albumGrid.classList.remove("is-expanded");
+  albumMoreButton.hidden = images.length <= 9;
+  albumMoreButton.setAttribute("aria-expanded", "false");
+  albumMoreButton.setAttribute("aria-label", "사진 더보기");
+
   if (!images.length) {
     albumGrid.innerHTML = `
       <div class="album__empty">
@@ -144,7 +274,7 @@ const renderAlbum = () => {
       const src = typeof item === "string" ? item : item.src;
       const alt = typeof item === "string" ? "웨딩 앨범 사진" : item.alt || "웨딩 앨범 사진";
       return `
-        <button type="button" class="album__item" data-album-index="${index}">
+        <button type="button" class="album__item${index >= 9 ? " album__item--extra" : ""}" data-album-index="${index}">
           <img src="${escapeHtml(src)}" alt="${escapeHtml(alt)}" loading="lazy" />
         </button>
       `;
@@ -157,6 +287,16 @@ const renderAlbum = () => {
     });
   });
 };
+
+albumMoreButton.addEventListener("click", () => {
+  const expanded = albumGrid.classList.toggle("is-expanded");
+  albumMoreButton.setAttribute("aria-expanded", String(expanded));
+  albumMoreButton.setAttribute("aria-label", expanded ? "사진 접기" : "사진 더보기");
+
+  if (!expanded) {
+    document.querySelector(".album").scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+});
 
 const getAlbumItem = (index) => {
   const images = Array.isArray(siteData.albumImages) ? siteData.albumImages : [];
@@ -176,7 +316,6 @@ const showAlbumImage = (index) => {
   const item = getAlbumItem(currentAlbumIndex);
   albumViewerImage.src = item.src;
   albumViewerImage.alt = item.alt;
-  albumViewerCaption.textContent = item.alt;
   albumViewer.hidden = false;
   document.body.classList.add("is-viewing-album");
 };
@@ -194,6 +333,10 @@ albumViewer.addEventListener("click", (event) => {
   if (event.target === albumViewer) closeAlbum();
 });
 document.addEventListener("keydown", (event) => {
+  if (!rsvpModal.hidden && event.key === "Escape") {
+    closeRsvpModal();
+    return;
+  }
   if (albumViewer.hidden) return;
   if (event.key === "Escape") closeAlbum();
   if (event.key === "ArrowLeft") showAlbumImage(currentAlbumIndex - 1);
@@ -270,7 +413,6 @@ const renderPetals = () => {
   if (!prefersReducedMotion) {
     const sectionCount = clamp(Number(petalConfig.sectionCount) || 3, 0, 10);
     createPetalLayer(document.querySelector(".intro"), "petal-layer--section", sectionCount);
-    createPetalLayer(document.querySelector(".info-band"), "petal-layer--section", sectionCount);
   }
 };
 
@@ -297,14 +439,16 @@ const renderAccounts = () => {
   accountList.innerHTML = accounts
     .map(
       (account, index) => `
-        <article class="account-card">
-          <div>
-            <span>${escapeHtml(account.side)}</span>
-            <strong>${escapeHtml(account.bank)} ${escapeHtml(account.number)}</strong>
-            <p>${escapeHtml(account.holder)} · ${escapeHtml(account.name)}</p>
+        <details class="account-card">
+          <summary><span>${escapeHtml(account.side)}</span><i aria-hidden="true"></i></summary>
+          <div class="account-card__body">
+            <div>
+              <strong>${escapeHtml(account.bank)} ${escapeHtml(account.number)}</strong>
+              <p>예금주 ${escapeHtml(account.holder)} · ${escapeHtml(account.name)}</p>
+            </div>
+            <button type="button" data-copy-account="${index}">복사</button>
           </div>
-          <button type="button" data-copy-account="${index}">복사</button>
-        </article>
+        </details>
       `,
     )
     .join("");

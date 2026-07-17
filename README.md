@@ -1,6 +1,6 @@
 # Mobile Wedding Invitation
 
-GitHub Pages에 배포할 수 있는 모바일 청첩장입니다. Supabase를 연결하면 방명록을 저장하고 최신순으로 보여줍니다.
+GitHub Pages에 배포할 수 있는 모바일 청첩장입니다. Supabase를 연결하면 방명록과 참석 의사 응답을 각각 분리해 저장합니다.
 
 ## Supabase 설정
 
@@ -10,7 +10,7 @@ GitHub Pages에 배포할 수 있는 모바일 청첩장입니다. Supabase를 �
 
 ## 관리자 계정
 
-방명록 수정/삭제는 `/admin.html`에서 합니다.
+참석 의사 확인과 방명록 수정/삭제는 `/admin.html`에서 합니다.
 
 1. Supabase Dashboard > Authentication > Users에서 관리자 계정을 만듭니다.
 2. 생성된 User UID를 복사합니다.
@@ -42,6 +42,7 @@ on conflict (user_id) do update set email = excluded.email;
 
 - `SUPABASE_URL`: Supabase Project URL
 - `SUPABASE_ANON_KEY`: Supabase anon public key
+- `NAVER_MAP_CLIENT_ID`: NAVER Cloud Maps 애플리케이션의 Client ID
 
 값을 넣은 뒤 `Actions > Deploy GitHub Pages > Run workflow`를 실행하거나, 아무 파일이나 수정해서 `main`에 push하면 다시 배포됩니다.
 
@@ -49,7 +50,7 @@ on conflict (user_id) do update set email = excluded.email;
 
 ## 로컬 확인
 
-로컬에서 실제 Supabase 연결을 테스트하려면 `config.example.js`를 `config.js`로 복사한 뒤 값을 채워 넣으세요. `config.js`는 `.gitignore`에 들어 있어 커밋되지 않습니다.
+로컬에서 실제 Supabase 연결과 네이버 지도를 테스트하려면 `config.example.js`를 `config.js`로 복사한 뒤 값을 채워 넣으세요. `config.js`는 `.gitignore`에 들어 있어 커밋되지 않습니다. 네이버 지도 Client ID를 사용할 때는 NAVER Cloud Maps 애플리케이션의 Web 서비스 URL에 로컬 주소와 실제 배포 도메인도 등록해야 합니다. Client Secret은 브라우저 코드나 GitHub Pages 설정에 넣지 않습니다.
 
 ## 사진 테스트 이미지
 
@@ -90,5 +91,6 @@ albumImages: [
 - [ ] GitHub Secrets 등록: `SUPABASE_URL`, `SUPABASE_ANON_KEY`
 - [ ] 관리자 계정 생성 후 `admin_users`에 UID 등록
 - [ ] 메인 페이지에서 방명록 작성 테스트
+- [ ] 메인 페이지에서 참석 의사 제출 및 `rsvp_responses` 저장 테스트
 - [ ] 작성한 방명록을 같은 브라우저에서 수정/삭제 테스트
-- [ ] `/admin.html`에서 방명록 수정/삭제 테스트
+- [ ] `/admin.html`에서 참석 응답 확인과 방명록 수정/삭제 테스트

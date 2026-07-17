@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#f7f1ea" />
-    <title>방명록 관리</title>
+    <title>청첩장 응답 관리</title>
     <link rel="stylesheet" href="./styles.css" />
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="./config.js"></script>
@@ -14,7 +14,7 @@
     <main class="site-shell admin-shell">
       <section class="section">
         <p class="eyebrow">Admin</p>
-        <h1 class="admin-title">방명록 관리</h1>
+        <h1 class="admin-title">청첩장 응답 관리</h1>
         <p class="admin-copy">Supabase Auth에 등록된 관리자 계정으로 로그인하세요.</p>
 
         <form id="login-form" class="guestbook__form">
@@ -31,6 +31,9 @@
 
         <div id="admin-panel" class="admin-panel" hidden>
           <button id="logout-button" type="button" class="secondary-button">로그아웃</button>
+          <div class="admin-section-head"><h2>참석 의사</h2><span id="admin-rsvp-count"></span></div>
+          <div id="admin-rsvp-list" class="admin-list"></div>
+          <div class="admin-section-head"><h2>방명록</h2></div>
           <div id="admin-list" class="admin-list"></div>
         </div>
 
