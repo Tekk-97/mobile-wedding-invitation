@@ -42,9 +42,10 @@ on conflict (user_id) do update set email = excluded.email;
 
 - `SUPABASE_URL`: Supabase Project URL
 - `SUPABASE_ANON_KEY`: Supabase anon public key
-- `NAVER_MAP_CLIENT_ID`: NAVER Cloud Maps 애플리케이션의 Client ID
 
 값을 넣은 뒤 `Actions > Deploy GitHub Pages > Run workflow`를 실행하거나, 아무 파일이나 수정해서 `main`에 push하면 다시 배포됩니다.
+
+네이버 Web Dynamic Map의 Client ID는 브라우저 SDK 요청에서 공개되는 값이므로 배포 워크플로에 직접 설정되어 있습니다. Client Secret은 브라우저 코드나 GitHub Pages 설정에 넣지 않습니다.
 
 주의: Supabase anon key는 브라우저에서 동작하는 공개 키입니다. public repo에는 남기지 않도록 했지만, 배포된 웹사이트의 JavaScript에서는 볼 수 있습니다. 보안은 `supabase-schema.sql`의 RLS 정책으로 보호합니다. `service_role` key는 절대 넣으면 안 됩니다.
 

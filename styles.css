@@ -2148,6 +2148,10 @@ body.is-viewing-rsvp {
   opacity: 0;
 }
 
+.venue-map-frame.is-map-error .venue-map-status {
+  color: #9b625c;
+}
+
 .venue-map-label {
   min-width: 174px;
   padding: 10px 13px;

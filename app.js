@@ -46,58 +46,78 @@ const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
 const initVenueMap = () => {
   if (!venueMapFrame || !venueMapHost) return;
 
-  const clientId = String(config.naverMapClientId || "").trim();
-  if (!clientId || clientId.includes("YOUR_")) return;
-
-  const renderMap = () => {
-    if (!window.naver?.maps?.Service) return;
-
-    const address = siteData.venue?.address || "경기 평택시 경기대로 721";
-    window.naver.maps.Service.geocode({ query: address }, (status, response) => {
-      const result = response?.v2?.addresses?.[0];
-      if (status !== window.naver.maps.Service.Status.OK || !result) return;
-
-      const position = new window.naver.maps.LatLng(Number(result.y), Number(result.x));
-      const map = new window.naver.maps.Map(venueMapHost, {
-        center: position,
-        zoom: 16,
-        minZoom: 12,
-        maxZoom: 19,
-        scrollWheel: false,
-        zoomControl: true,
-        zoomControlOptions: {
-          position: window.naver.maps.Position.RIGHT_CENTER,
-        },
-      });
-
-      const marker = new window.naver.maps.Marker({ map, position });
-      const infoWindow = new window.naver.maps.InfoWindow({
-        content: '<div class="venue-map-label"><strong>엔팰리스웨딩컨벤션</strong><span>블리스홀 · 오전 11시</span></div>',
-        borderWidth: 0,
-        backgroundColor: "transparent",
-        anchorSize: new window.naver.maps.Size(0, 0),
-        pixelOffset: new window.naver.maps.Point(0, -12),
-      });
-      infoWindow.open(map, marker);
-      venueMapFrame.classList.add("is-map-ready");
-
-      if ("ResizeObserver" in window) {
-        new ResizeObserver(() => {
-          window.naver.maps.Event.trigger(map, "resize");
-          map.setCenter(position);
-        }).observe(venueMapHost);
-      }
-    });
+  const mapStatus = venueMapFrame.querySelector(".venue-map-status");
+  const showMapError = (message) => {
+    venueMapFrame.classList.remove("is-map-ready");
+    venueMapFrame.classList.add("is-map-error");
+    if (mapStatus) mapStatus.textContent = message;
   };
 
-  if (window.naver?.maps?.Service) {
+  const clientId = String(config.naverMapClientId || "").trim();
+  if (!clientId || clientId.includes("YOUR_")) {
+    showMapError("네이버 지도 Client ID 설정을 확인해 주세요.");
+    return;
+  }
+
+  const renderMap = () => {
+    if (!window.naver?.maps?.Map) {
+      showMapError("네이버 지도 SDK를 불러오지 못했습니다.");
+      return;
+    }
+
+    const lat = Number(siteData.venue?.lat);
+    const lng = Number(siteData.venue?.lng);
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+      showMapError("예식장 지도 좌표를 확인해 주세요.");
+      return;
+    }
+
+    const position = new window.naver.maps.LatLng(lat, lng);
+    const map = new window.naver.maps.Map(venueMapHost, {
+      center: position,
+      zoom: 16,
+      minZoom: 12,
+      maxZoom: 19,
+      scrollWheel: false,
+      zoomControl: true,
+      zoomControlOptions: {
+        position: window.naver.maps.Position.RIGHT_CENTER,
+      },
+    });
+
+    const marker = new window.naver.maps.Marker({ map, position });
+    const infoWindow = new window.naver.maps.InfoWindow({
+      content: '<div class="venue-map-label"><strong>엔팰리스웨딩컨벤션</strong><span>블리스홀 · 오전 11시</span></div>',
+      borderWidth: 0,
+      backgroundColor: "transparent",
+      anchorSize: new window.naver.maps.Size(0, 0),
+      pixelOffset: new window.naver.maps.Point(0, -12),
+    });
+    infoWindow.open(map, marker);
+    venueMapFrame.classList.remove("is-map-error");
+    venueMapFrame.classList.add("is-map-ready");
+
+    if ("ResizeObserver" in window) {
+      new ResizeObserver(() => {
+        window.naver.maps.Event.trigger(map, "resize");
+        map.setCenter(position);
+      }).observe(venueMapHost);
+    }
+  };
+
+  if (window.naver?.maps?.Map) {
     renderMap();
     return;
   }
 
+  window.navermap_authFailure = () => {
+    showMapError("네이버 지도 인증에 실패했습니다. Client ID와 Web 서비스 URL을 확인해 주세요.");
+  };
+
   const script = document.createElement("script");
-  script.src = `https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=${encodeURIComponent(clientId)}&submodules=geocoder`;
+  script.src = `https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=${encodeURIComponent(clientId)}`;
   script.addEventListener("load", renderMap, { once: true });
+  script.addEventListener("error", () => showMapError("네이버 지도 SDK 연결에 실패했습니다."), { once: true });
   document.head.appendChild(script);
 };
 

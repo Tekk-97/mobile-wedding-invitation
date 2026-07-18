@@ -30,7 +30,7 @@ jobs:
           window.WEDDING_CONFIG = {
             supabaseUrl: "${{ secrets.SUPABASE_URL }}",
             supabaseAnonKey: "${{ secrets.SUPABASE_ANON_KEY }}",
-            naverMapClientId: "${{ secrets.NAVER_MAP_CLIENT_ID }}",
+            naverMapClientId: "4rk4pajd7u",
           };
           EOF
 
