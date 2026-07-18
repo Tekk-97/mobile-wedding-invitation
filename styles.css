@@ -1555,6 +1555,11 @@ button:disabled {
   min-height: 100vh;
 }
 
+.admin-shell .section {
+  opacity: 1;
+  transform: none;
+}
+
 .admin-title {
   color: var(--ink);
   font-size: 2.4rem;
