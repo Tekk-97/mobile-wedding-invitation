@@ -55,17 +55,17 @@ window.WEDDING_SITE_DATA = {
   accounts: [
     {
       side: "신랑측",
-      name: "배형범",
       bank: "농협",
       number: "356-1197-7793-23",
       holder: "배형범",
+      parents: "배학연 · 김미영",
     },
     {
       side: "신부측",
-      name: "박수빈",
       bank: "기업",
       number: "587-045441-01-017",
       holder: "박수빈",
+      parents: "박영운 · 정지윤",
     },
   ],
 };

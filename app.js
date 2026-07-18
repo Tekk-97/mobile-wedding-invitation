@@ -464,7 +464,8 @@ const renderAccounts = () => {
           <div class="account-card__body">
             <div>
               <strong>${escapeHtml(account.bank)} ${escapeHtml(account.number)}</strong>
-              <p>예금주 ${escapeHtml(account.holder)} · ${escapeHtml(account.name)}</p>
+              <p>예금주 ${escapeHtml(account.holder)}</p>
+              ${account.parents ? `<p class="account-card__parents">부모님 ${escapeHtml(account.parents)}</p>` : ""}
             </div>
             <button type="button" data-copy-account="${index}">복사</button>
           </div>
