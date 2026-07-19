@@ -202,7 +202,10 @@ rsvpForm.addEventListener("submit", async (event) => {
   submitButton.disabled = false;
 
   if (error) {
-    rsvpStatus.textContent = "저장하지 못했습니다. 잠시 후 다시 시도해 주세요.";
+    const schemaMissing = ["PGRST202", "PGRST205", "42P01"].includes(error.code);
+    rsvpStatus.textContent = schemaMissing
+      ? "참석 의사 저장 기능을 준비 중입니다. 잠시 후 다시 시도해 주세요."
+      : "저장하지 못했습니다. 잠시 후 다시 시도해 주세요.";
     return;
   }
 

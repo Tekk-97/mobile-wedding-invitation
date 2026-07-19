@@ -8,6 +8,8 @@ GitHub Pages에 배포할 수 있는 모바일 청첩장입니다. Supabase를 �
 2. SQL Editor에서 `supabase-schema.sql` 내용을 실행합니다.
 3. Project Settings > API에서 Project URL과 anon public key를 확인합니다.
 
+이전에 SQL을 실행했더라도 스키마 파일이 변경된 경우에는 전체 내용을 다시 실행하세요. RSVP가 동작하려면 `rsvp_responses` 테이블과 `submit_rsvp_response` 함수가 모두 생성되어 있어야 합니다.
+
 ## 관리자 계정
 
 참석 의사 확인과 방명록 수정/삭제는 `/admin.html`에서 합니다.

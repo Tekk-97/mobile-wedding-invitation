@@ -115,14 +115,24 @@ const loadRows = async () => {
       .limit(200),
   ]);
 
-  if (guestbookResult.error || rsvpResult.error) {
-    setStatus("관리자 권한이 없거나 응답 정보를 불러오지 못했습니다.");
-    return;
+  const failedSections = [];
+
+  if (guestbookResult.error) {
+    failedSections.push("방명록");
+    adminList.innerHTML = '<article class="message"><p>방명록을 불러오지 못했습니다.</p></article>';
+  } else {
+    renderRows(guestbookResult.data || []);
   }
 
-  renderRsvpRows(rsvpResult.data || []);
-  renderRows(guestbookResult.data || []);
-  setStatus("");
+  if (rsvpResult.error) {
+    failedSections.push("참석 의사");
+    adminRsvpCount.textContent = "";
+    adminRsvpList.innerHTML = '<article class="message"><p>참석 의사를 불러오지 못했습니다.</p></article>';
+  } else {
+    renderRsvpRows(rsvpResult.data || []);
+  }
+
+  setStatus(failedSections.length ? `${failedSections.join(" · ")} 정보를 불러오지 못했습니다.` : "");
 };
 
 const showPanel = async () => {

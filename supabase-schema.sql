@@ -434,3 +434,6 @@ grant execute on function public.admin_delete_rsvp_response(bigint) to authentic
 -- insert into public.admin_users (user_id, email)
 -- values ('USER_UID_HERE', 'admin@example.com')
 -- on conflict (user_id) do update set email = excluded.email;
+
+-- 새 테이블과 RPC 함수가 PostgREST에 즉시 반영되도록 스키마 캐시를 갱신합니다.
+notify pgrst, 'reload schema';
