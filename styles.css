@@ -574,7 +574,7 @@ button {
 .story__photo--portrait img { object-position: 50% 18%; }
 .story__copy { text-align: left; }
 .story__copy span { display: block; color: #a4927b; font-family: "Gowun Batang", serif; font-size: .75rem; }
-.story__copy strong { display: block; margin: 5px 0 7px; font-family: "Gowun Batang", serif; font-size: 1.1rem; }
+.story__copy strong { display: block; margin: 5px 0 7px; font-family: "Gowun Batang", serif; font-size: 1.1rem; line-height: 1.55; word-break: keep-all; }
 .story__copy p { margin: 0; color: var(--muted); font-size: .82rem; line-height: 1.7; word-break: keep-all; }
 .story__item--right .story__photo { grid-column: 2; grid-row: 1; transform: rotate(2deg); }
 .story__item--right .story__copy { grid-column: 1; grid-row: 1; text-align: right; }
@@ -1275,6 +1275,21 @@ body.is-viewing-album .album {
   font-size: .8rem;
   line-height: 1.55;
   list-style: none;
+}
+
+.route-guide .parking-list {
+  gap: 9px;
+}
+
+.route-guide .parking-list li {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  gap: 7px;
+}
+
+.route-guide .parking-list strong {
+  color: var(--ink);
+  font-weight: 500;
 }
 
 .location .route-guide__notice {
