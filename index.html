@@ -18,12 +18,11 @@
       href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz,wght@6..96,400;6..96,500&family=Gowun+Batang:wght@400;700&family=Great+Vibes&family=Nanum+Pen+Script&family=Noto+Sans+KR:wght@400;500;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./styles.css?v=20260719-game-team" />
+    <link rel="stylesheet" href="./styles.css" />
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="./site-data.js?v=20260730-gallery-order-3"></script>
     <script src="./config.js"></script>
     <script defer src="./app.js"></script>
-    <script defer src="./game.js?v=20260719-game-team"></script>
   </head>
   <body>
     <main class="site-shell">
@@ -253,13 +252,6 @@
 
         <div id="guestbook-list" class="guestbook__list" aria-live="polite"></div>
       </section>
-
-      <section class="section game-entry" aria-label="웨딩 미니게임">
-        <button id="spot-game-open" class="game-entry__button" type="button" aria-haspopup="dialog">
-          <span aria-hidden="true">🎮</span>
-          <small>틀린그림찾기</small>
-        </button>
-      </section>
     </main>
     <div id="album-viewer" class="album-viewer" hidden>
       <button class="album-viewer__close" type="button" aria-label="닫기">×</button>
@@ -298,84 +290,6 @@
           <button class="rsvp-form__submit" type="submit">체크 완료하기</button>
           <p id="rsvp-status" class="status" role="status"></p>
         </form>
-      </div>
-    </div>
-    <div id="spot-game" class="spot-game" role="dialog" aria-modal="true" aria-labelledby="spot-game-title" hidden>
-      <div class="spot-game__panel">
-        <header class="spot-game__header">
-          <div>
-            <p>Wedding mini game</p>
-            <h2 id="spot-game-title">틀린그림찾기</h2>
-          </div>
-          <button id="spot-game-close" class="spot-game__close" type="button" aria-label="게임 닫기">×</button>
-        </header>
-
-        <section id="spot-game-intro" class="spot-game__intro">
-          <span class="spot-game__intro-icon" aria-hidden="true">♡</span>
-          <h3>두 사진 속 다른 곳을 찾아주세요</h3>
-          <p>달라진 곳은 모두 5개예요.<br />틀릴 때마다 기록에 3초가 추가됩니다.</p>
-          <fieldset class="spot-team-choice">
-            <legend>어느 팀으로 참여할까요?</legend>
-            <div>
-              <label><input type="radio" name="spot-side" value="신랑" /><span>신랑측</span></label>
-              <label><input type="radio" name="spot-side" value="신부" /><span>신부측</span></label>
-            </div>
-          </fieldset>
-          <button id="spot-game-start" type="button" disabled>팀을 선택해 주세요</button>
-        </section>
-
-        <section id="spot-game-play" class="spot-game__play" hidden>
-          <div class="spot-game__stats" aria-live="polite">
-            <span>찾은 차이 <strong id="spot-found-count">0 / 5</strong></span>
-            <span>시간 <strong id="spot-timer">00:00.0</strong></span>
-            <span>실수 <strong id="spot-mistakes">0</strong></span>
-          </div>
-          <p class="spot-game__hint"><strong id="spot-current-team"></strong> · 원본과 다른 사진 어느 쪽이든 눌러보세요.</p>
-          <div class="spot-game__boards">
-            <figure>
-              <figcaption>ORIGIN</figcaption>
-              <div class="spot-board" data-spot-board="original">
-                <img data-game-src="./Image/game/spot-wedding-base.webp?v=20260720-spot-v2" alt="틀린그림찾기 원본 웨딩 사진" draggable="false" />
-              </div>
-            </figure>
-            <figure>
-              <figcaption>EDITED</figcaption>
-              <div class="spot-board spot-board--different" data-spot-board="different">
-                <img data-game-src="./Image/game/spot-wedding-base.webp?v=20260720-spot-v2" alt="기존 요소 다섯 군데가 달라진 웨딩 사진" draggable="false" />
-                <img class="spot-board__overlay" data-game-src="./Image/game/spot-differences-overlay.svg?v=20260720-spot-v2" alt="" aria-hidden="true" draggable="false" />
-              </div>
-            </figure>
-          </div>
-
-          <div id="spot-game-result" class="spot-game__result" hidden>
-            <span aria-hidden="true">♥</span>
-            <h3>다 찾았어요!</h3>
-            <p id="spot-result-time"></p>
-            <form id="spot-score-form">
-              <label for="spot-player-name">랭킹에 남길 이름</label>
-              <div><input id="spot-player-name" name="name" maxlength="12" autocomplete="nickname" placeholder="이름" required /><button type="submit">기록 등록</button></div>
-            </form>
-            <p id="spot-score-status" class="status" role="status"></p>
-            <button id="spot-game-retry" class="spot-game__retry" type="button">다시 도전하기</button>
-          </div>
-        </section>
-
-        <section class="spot-ranking" aria-labelledby="spot-ranking-title">
-          <div class="spot-ranking__head"><h3 id="spot-ranking-title">웨딩 랭킹</h3><span>TOP 10</span></div>
-          <div class="spot-team-battle" aria-label="신랑측 신부측 합산 점수">
-            <div class="spot-team-battle__scores">
-              <p><span>신랑측</span><strong id="spot-groom-points">0점</strong><small id="spot-groom-players">0명</small></p>
-              <p><span>신부측</span><strong id="spot-bride-points">0점</strong><small id="spot-bride-players">0명</small></p>
-            </div>
-            <div class="spot-team-battle__bar">
-              <i id="spot-groom-bar" class="spot-team-battle__groom" style="width:50%"></i>
-              <i id="spot-bride-bar" class="spot-team-battle__bride" style="width:50%"></i>
-              <b>VS</b>
-            </div>
-            <p id="spot-team-status" class="spot-team-battle__status">양측의 합산 점수를 불러옵니다.</p>
-          </div>
-          <ol id="spot-ranking-list"><li class="spot-ranking__empty">게임을 열면 랭킹을 불러옵니다.</li></ol>
-        </section>
       </div>
     </div>
   </body>
