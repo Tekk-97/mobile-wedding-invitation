@@ -1,6 +1,6 @@
 # Mobile Wedding Invitation
 
-GitHub Pages에 배포할 수 있는 모바일 청첩장입니다. Supabase를 연결하면 방명록과 참석 의사 응답을 각각 분리해 저장합니다.
+GitHub Pages에 배포할 수 있는 모바일 청첩장입니다. Supabase를 연결하면 방명록, 참석 의사 응답, 틀린그림찾기 랭킹을 각각 분리해 저장합니다.
 
 ## Supabase 설정
 
@@ -8,7 +8,9 @@ GitHub Pages에 배포할 수 있는 모바일 청첩장입니다. Supabase를 �
 2. SQL Editor에서 `supabase-schema.sql` 내용을 실행합니다.
 3. Project Settings > API에서 Project URL과 anon public key를 확인합니다.
 
-이전에 SQL을 실행했더라도 스키마 파일이 변경된 경우에는 전체 내용을 다시 실행하세요. RSVP가 동작하려면 `rsvp_responses` 테이블과 `submit_rsvp_response` 함수가 모두 생성되어 있어야 합니다.
+이전에 SQL을 실행했더라도 스키마 파일이 변경된 경우에는 전체 내용을 다시 실행하세요. RSVP가 동작하려면 `rsvp_responses` 테이블과 `submit_rsvp_response` 함수가, 게임 랭킹이 동작하려면 `spot_game_scores` 테이블과 게임 RPC 함수가 생성되어 있어야 합니다.
+
+틀린그림찾기 랭킹은 같은 브라우저에서 가장 빠른 기록 한 건만 유지합니다. 기록이 빠를수록 높은 점수를 받고, 선택한 신랑측·신부측의 점수에 합산되어 VS 바로 표시됩니다. 공개 페이지는 개인 상위 10개와 양측 합산 결과만 RPC로 읽기 때문에 랭킹 트래픽과 DB 행 증가를 제한합니다.
 
 ## 관리자 계정
 
@@ -95,5 +97,6 @@ albumImages: [
 - [ ] 관리자 계정 생성 후 `admin_users`에 UID 등록
 - [ ] 메인 페이지에서 방명록 작성 테스트
 - [ ] 메인 페이지에서 참석 의사 제출 및 `rsvp_responses` 저장 테스트
+- [ ] 틀린그림찾기 완료 후 `spot_game_scores` 랭킹 저장 테스트
 - [ ] 작성한 방명록을 같은 브라우저에서 수정/삭제 테스트
 - [ ] `/admin.html`에서 참석 응답 확인과 방명록 수정/삭제 테스트
