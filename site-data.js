@@ -156,11 +156,35 @@ window.WEDDING_SITE_DATA = {
       parents: "배학연 · 김미영",
     },
     {
+      side: "신랑측",
+      bank: "우리은행",
+      number: "1002-440-129325
+      holder: "배학연"
+    },
+    {
+      side: "신랑측",
+      bank: "농협",
+      number: "205011-56-139836",
+      holder: "김미영",
+    },
+    {
       side: "신부측",
       bank: "기업",
       number: "587-045441-01-017",
       holder: "박수빈",
       parents: "박영운 · 정지윤",
+    },
+    {
+      side: "신부측",
+      bank: "기업",
+      number: "148-093395-01-013",
+      holder: "정지윤",
+    },
+    {
+      side: "신부측",
+      bank: "기업",
+      number: "1002-460-657479",
+      holder: "박영운",
     },
   ],
 };
