@@ -1360,9 +1360,11 @@ body.is-viewing-album .album {
 
 .account-card {
   display: block;
+  overflow: hidden;
   padding: 0;
-  border-radius: 5px;
-  background: #fbf8f4;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--paper);
 }
 
 .account-card summary {
@@ -1373,6 +1375,11 @@ body.is-viewing-album .album {
   padding: 0 18px;
   cursor: pointer;
   list-style: none;
+}
+
+.account-card summary:focus-visible {
+  outline: 2px solid var(--rose);
+  outline-offset: -3px;
 }
 
 .account-card summary::-webkit-details-marker {
@@ -1393,7 +1400,7 @@ body.is-viewing-album .album {
   border-right: 1px solid var(--muted);
   border-bottom: 1px solid var(--muted);
   transform: rotate(45deg) translateY(-3px);
-  transition: transform .25s ease;
+  transition: transform .2s ease;
 }
 
 .account-card[open] summary i {
@@ -1401,30 +1408,127 @@ body.is-viewing-album .album {
 }
 
 .account-card__body {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 12px;
-  align-items: center;
-  padding: 17px 18px 18px;
+  display: block;
+  padding: 0 18px 18px;
   border-top: 1px solid var(--line);
 }
 
-.account-card__body strong {
-  font-size: .9rem;
+.account-card__main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: center;
+  padding: 18px 0;
 }
 
-.account-card__body p {
+.account-card .account-card__person {
+  display: block;
+  margin: 0 0 7px;
+  color: var(--rose);
+  font-size: .78rem;
+  font-weight: 700;
+}
+
+.account-card__info strong {
+  display: block;
+  color: var(--ink);
+  font-size: .9rem;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+.account-card__info p {
   margin: 5px 0 0;
   color: var(--muted);
   font-size: .78rem;
+  line-height: 1.5;
 }
 
-.account-card__body .account-card__parents {
-  margin-top: 2px;
-}
-
-.account-card__body button {
+.account-card .account-card__copy {
+  width: 68px;
   min-height: 38px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 0 10px;
+  background: var(--white);
+  color: var(--ink);
+  font-size: .82rem;
+  font-weight: 700;
+}
+
+.parent-accounts {
+  padding-top: 17px;
+  border-top: 1px solid var(--line);
+}
+
+.parent-accounts h3 {
+  margin: 0 0 11px;
+  color: var(--ink);
+  font-family: "Noto Sans KR", system-ui, sans-serif;
+  font-size: .9rem;
+  font-weight: 700;
+}
+
+.parent-accounts__list {
+  display: grid;
+  gap: 9px;
+}
+
+.account-card .parent-account {
+  display: grid;
+  width: 100%;
+  min-height: 0;
+  justify-content: stretch;
+  gap: 5px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 14px 15px;
+  background: var(--white);
+  color: var(--ink);
+  font-family: "Noto Sans KR", system-ui, sans-serif;
+  font-weight: 400;
+  text-align: left;
+}
+
+.account-card .parent-account__name {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0;
+  color: var(--ink);
+  font-size: .88rem;
+  font-weight: 700;
+}
+
+.parent-account__name small {
+  color: var(--rose);
+  font-size: .72rem;
+  font-weight: 700;
+}
+
+.parent-account strong {
+  display: block;
+  color: var(--ink);
+  font-size: .82rem;
+  font-weight: 500;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.account-card .parent-account__hint {
+  display: block;
+  min-height: 1.45em;
+  margin: 2px 0 0;
+  color: var(--muted);
+  font-size: .7rem;
+  font-weight: 400;
+  line-height: 1.45;
+}
+
+.account-card__copy:focus-visible,
+.parent-account:focus-visible {
+  outline: 2px solid var(--rose);
+  outline-offset: 2px;
 }
 
 @media (prefers-reduced-motion: reduce) {

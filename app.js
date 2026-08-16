@@ -441,61 +441,156 @@ const renderPetals = () => {
 
 const copyText = async (text) => {
   if (navigator.clipboard?.writeText) {
-    await navigator.clipboard.writeText(text);
-    return;
+    try {
+      await navigator.clipboard.writeText(text);
+      return;
+    } catch {
+      // 보안 컨텍스트나 권한 문제로 실패하면 아래의 레거시 방식을 시도한다.
+    }
   }
 
   const textarea = document.createElement("textarea");
+  const activeElement = document.activeElement;
   textarea.value = text;
   textarea.setAttribute("readonly", "");
   textarea.style.position = "fixed";
+  textarea.style.top = "0";
+  textarea.style.left = "-9999px";
   textarea.style.opacity = "0";
   document.body.append(textarea);
+  textarea.focus();
   textarea.select();
-  document.execCommand("copy");
-  textarea.remove();
+  textarea.setSelectionRange(0, textarea.value.length);
+
+  try {
+    if (!document.execCommand("copy")) {
+      throw new Error("Clipboard copy failed");
+    }
+  } finally {
+    textarea.remove();
+    activeElement?.focus?.();
+  }
+};
+
+const parseParentAccounts = (parents) =>
+  String(parents || "")
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line, index) => {
+      const [holder = "", bank = "", ...numberParts] = line.split(/\s+/);
+
+      return {
+        relation: index === 0 ? "아버지" : index === 1 ? "어머니" : "부모님",
+        holder,
+        bank,
+        number: numberParts.join(" "),
+      };
+    });
+
+const copyFeedbackTimers = new WeakMap();
+
+const showTemporaryText = (element, message, duration = 1000) => {
+  if (!element) return;
+
+  const originalText = element.dataset.originalText || element.textContent;
+  element.dataset.originalText = originalText;
+  clearTimeout(copyFeedbackTimers.get(element));
+  element.textContent = message;
+
+  const timer = setTimeout(() => {
+    element.textContent = originalText;
+    copyFeedbackTimers.delete(element);
+  }, duration);
+
+  copyFeedbackTimers.set(element, timer);
 };
 
 const renderAccounts = () => {
   const accounts = Array.isArray(siteData.accounts) ? siteData.accounts : [];
 
   accountList.innerHTML = accounts
-    .map(
-      (account, index) => `
+    .map((account, index) => {
+      const person = String(account.side || "").replace(/\s*측$/, "");
+      const parentAccounts = parseParentAccounts(account.parents);
+
+      return `
         <details class="account-card">
           <summary><span>${escapeHtml(account.side)}</span><i aria-hidden="true"></i></summary>
           <div class="account-card__body">
-            <div>
-              <strong>${escapeHtml(account.bank)} ${escapeHtml(account.number)}</strong>
-              <p>예금주 ${escapeHtml(account.holder)}</p>
-              ${account.parents ? `<p class="account-card__parents">부모님 ${escapeHtml(account.parents)}</p>` : ""}
+            <div class="account-card__main">
+              <div class="account-card__info">
+                <span class="account-card__person">${escapeHtml(person)}</span>
+                <strong>${escapeHtml(account.bank)} ${escapeHtml(account.number)}</strong>
+                <p>예금주 ${escapeHtml(account.holder)}</p>
+              </div>
+              <button class="account-card__copy" type="button" data-copy-account="${index}" aria-label="${escapeHtml(person)} 계좌 복사">복사</button>
             </div>
-            <button type="button" data-copy-account="${index}">복사</button>
+            ${
+              parentAccounts.length
+                ? `<section class="parent-accounts" aria-labelledby="parent-accounts-title-${index}">
+                    <h3 id="parent-accounts-title-${index}">부모님 계좌</h3>
+                    <div class="parent-accounts__list">
+                      ${parentAccounts
+                        .map(
+                          (parent, parentIndex) => `
+                            <button
+                              class="parent-account"
+                              type="button"
+                              data-copy-parent="${parentIndex}"
+                              data-account-index="${index}"
+                              aria-label="${escapeHtml(`${parent.relation} ${parent.holder} 계좌 정보 복사`)}"
+                            >
+                              <span class="parent-account__name"><small>${escapeHtml(parent.relation)}</small>${escapeHtml(parent.holder)}</span>
+                              <strong>${escapeHtml(parent.bank)} ${escapeHtml(parent.number)}</strong>
+                              <span class="parent-account__hint" aria-live="polite">눌러서 계좌 정보 복사</span>
+                            </button>
+                          `,
+                        )
+                        .join("")}
+                    </div>
+                  </section>`
+                : ""
+            }
           </div>
         </details>
-      `,
-    )
+      `;
+    })
     .join("");
 };
 
 accountList.addEventListener("click", async (event) => {
+  const parentButton = event.target.closest("[data-copy-parent]");
+  if (parentButton) {
+    const account = siteData.accounts?.[Number(parentButton.dataset.accountIndex)];
+    const parent = parseParentAccounts(account?.parents)[Number(parentButton.dataset.copyParent)];
+    if (!parent?.number) return;
+
+    const hint = parentButton.querySelector(".parent-account__hint");
+    const copyValue = `${parent.bank} ${parent.number} ${parent.holder}`;
+
+    try {
+      await copyText(copyValue);
+      showTemporaryText(hint, "복사되었습니다 ✓");
+    } catch {
+      showTemporaryText(hint, "복사하지 못했습니다");
+    }
+    return;
+  }
+
   const button = event.target.closest("[data-copy-account]");
   if (!button) return;
 
-  const account = siteData.accounts[Number(button.dataset.copyAccount)];
+  const account = siteData.accounts?.[Number(button.dataset.copyAccount)];
+  if (!account) return;
+
   const copyValue = `${account.bank} ${account.number} ${account.holder}`;
 
   try {
     await copyText(copyValue);
-    button.textContent = "복사됨";
-    setTimeout(() => {
-      button.textContent = "복사";
-    }, 1400);
+    showTemporaryText(button, "복사됨");
   } catch {
-    button.textContent = "실패";
-    setTimeout(() => {
-      button.textContent = "복사";
-    }, 1400);
+    showTemporaryText(button, "실패");
   }
 });
 
