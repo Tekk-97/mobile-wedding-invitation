@@ -158,7 +158,7 @@ window.WEDDING_SITE_DATA = {
     {
       side: "신랑측",
       bank: "우리은행",
-      number: "1002-440-129325
+      number: "1002-440-129325",
       holder: "배학연"
     },
     {
@@ -178,7 +178,7 @@ window.WEDDING_SITE_DATA = {
       side: "신부측",
       bank: "기업",
       number: "148-093395-01-013",
-      holder: "정지윤",
+      holder: "정지윤",      
     },
     {
       side: "신부측",
